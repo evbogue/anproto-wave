@@ -1,0 +1,18 @@
+/* Only notebook-specific layout; the visual system is copied from Wiredove. */
+body { margin-top: 16px; }
+.message-meta { position:static; display:block; color:var(--wiredove-muted); font-size:.9em; }
+.message-main > img, .person > img { flex-shrink:0; }
+.toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:8px 0; }
+select { max-width:220px; padding:5px; }
+textarea { box-sizing:border-box; width:100%; min-height:90px; }
+.wave-text { white-space:pre-wrap; overflow-wrap:anywhere; }
+.reply-group { margin-left:20px; border-left:2px solid var(--wiredove-control-border); padding-left:8px; }
+.participants { display:flex; flex-wrap:wrap; gap:12px; margin:12px 0; }
+.person { display:inline-flex; align-items:center; gap:6px; }
+.conflict { border-left:3px solid #e69a35; padding-left:10px; }
+.profile-photo { width:80px; height:80px; border-radius:50%; object-fit:cover; }
+button, summary { cursor:pointer; }
+[hidden] { display:none !important; }
+#notice { padding:8px; overflow-wrap:anywhere; }
+input[type=text] { box-sizing:border-box; width:100%; }
+footer { margin-top:20px; }

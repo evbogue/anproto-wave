@@ -22,15 +22,15 @@ npm test
 
 See [VENDOR.md](VENDOR.md) for copied source attribution and the boundary between Wiredove reuse and the demo's local profile format.
 
-## Planned direction
+## Planned collaboration architecture
 
-The next prototype will use Automerge to merge concurrent text edits, with one collaborative document per blip. ANProto will sign durable contributions and identify participants; clients will verify signatures and wave membership before applying Automerge changes. A loopback relay will store and forward signed records so independent browsers can edit together and catch up after a disconnect. This is the chosen architecture, not functionality in the current demo.
+We will investigate and build an ANProto-specific CRDT for concurrent text editing, carried by signed ANProto events. This is the chosen direction; its merge rules and wire format still need to be proven and specified. ANProto's independently verifiable, portable authorship and integrity guarantees remain required: durable contributions must verify apart from the relay and CRDT implementation. A loopback relay will store and forward records so independent browsers can collaborate and catch up after disconnects. None of this collaboration architecture is implemented in the current demo. See the [custom CRDT work order](CUSTOM_MERGE_WORK_ORDER.md) and [decision record](ARCHITECTURE_COMPARISON.md). The earlier [Automerge work order](IMPLEMENTATION_WORK_ORDER.md) is retained for historical comparison and shared product requirements; Automerge is no longer the intended dependency.
 
-Keyhive is a possible later option for encrypted documents and changing access rights. The first prototype keeps fixed membership and public data. The [implementation work order](IMPLEMENTATION_WORK_ORDER.md) describes the intended interactions and release gates; this README records Automerge as the chosen text engine.
+Keyhive is a possible later option for encrypted documents and changing access rights; it would complement rather than replace ANProto's signed authorship records, and the identity keys would need an explicit binding. The planned first prototype keeps fixed membership and public data. Its membership checks are not confidentiality.
 
 ## Research
 
 Historical baseline: Google Wave's developer preview was unveiled at Google I/O on May 28, 2009. See the [verified chronology](GOOGLE_WAVE_RESEARCH.md#verified-chronology) for the separate public-access, development, and shutdown milestones.
 
 - [Offline Google Wave references](references/google-wave/README.md) — original specifications, three Google-published interface screenshots, and Google I/O video links with dates and provenance.
-- [How we think Google Wave worked](GOOGLE_WAVE_RESEARCH.md) — sourced design research covering the platform, collaboration model, automated participants, and implications for ANProto Wave.
+- [How we think Google Wave worked](GOOGLE_WAVE_RESEARCH.md) — sourced design research covering the platform, collaboration model, automated participants, and implications for ANProto Wave; includes a comparison of the May and July 2009 federation drafts and the different authority model proposed for this prototype.

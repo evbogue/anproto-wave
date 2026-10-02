@@ -9,11 +9,24 @@ Retrieved 22 September 2026 for ANProto Wave implementation research. These are 
 3. Watch the 2009 product demonstration linked below to study interaction over time. Still images cannot prove live editing behavior.
 4. Read the federation and client/server documents for architectural distinctions, not as requirements to reuse Google's tools.
 
-The `.rst` files are the original readable text sources, not our summaries. The `.html` files preserve the published rendering. Documents are unmodified downloads; some external links and referenced resources may be dead or require a network connection. The downloaded blog pages are provenance snapshots, not fully self-contained offline websites; scripts and remote assets were not mirrored.
+The `.rst` files are the original readable text sources, not our summaries. The `.html` files preserve the published rendering. These Apache copies are unmodified downloads; some external links and referenced resources may be dead or require a network connection. The May 2009 Wayback material is a user-supplied text transcript, not an unmodified HTML download. The downloaded blog pages are provenance snapshots, not fully self-contained offline websites; scripts and remote assets were not mirrored.
 
 ## Specifications downloaded
 
 Source archive: [Apache Wave whitepapers](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/).
+
+### Recovery of the former `waveprotocol.org` draft-specs material
+
+The requested historical URL, `http://www.waveprotocol.org/draft-protocol-specs`, is no longer available as a live site. Its documents are already represented in this collection as the original readable text and HTML copied from the Apache Wave whitepapers archive. The Google Wave Conversation Model points readers to that old URL; historical references also identify `draft-protocol-spec` as the federation protocol document. The link mapping below is based on those source documents and a June 2010 protocol mailing-list change record, not on a recovered copy of the old index page.
+
+| Former Wave Protocol page | Preserved local copy | Current source copy |
+| --- | --- | --- |
+| `.../wave-conversation-model` | [Conversation HTML](specs/conversation/convspec.html), [text](specs/conversation/convspec.rst) | [Apache HTML](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/conversation/convspec.html) |
+| `.../draft-protocol-spec` | [Federation HTML](specs/federation/wavespec.html), [text](specs/federation/wavespec.rst), [schema](specs/federation/waveschema.rnc) | [Apache HTML](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html) |
+
+The older **May 2009** capture and the later **July 2009** Apache-hosted federation draft are compared in [the project research notes](../../GOOGLE_WAVE_RESEARCH.md#the-may-and-july-2009-federation-drafts). The May transcript includes the Wayback page chrome and spec body; the selected snapshot's exact timestamp is not shown in the pasted text.
+
+The historical link names are corroborated by the [June 2010 protocol mailing-list change](https://groups.google.com/g/wave-protocol-code-discuss/c/8pnxHcYORKM). Wayback search also surfaced an [archived 2009 project homepage](https://web.archive.org/web/20090530164834/http://www.waveprotocol.org/), a [2018 homepage capture](https://web.archive.org/web/20180712170918/http://www.waveprotocol.org/), and a 2011-cited [federation draft capture](https://web.archive.org/web/20110104133730/http://www.waveprotocol.org/protocol/draft-protocol-specs/draft-protocol-spec). The Wayback host did not return the archived page bodies during the initial recovery pass. The user subsequently supplied a text copy of the May 2009 Wayback capture for `http://www.waveprotocol.org/draft-protocol-spec`; it is preserved as a [Wayback transcript](specs/federation/draft-protocol-spec-wayback-transcript.txt). The pasted Wayback toolbar reports an overall capture range from May 31, 2009 through February 17, 2026; the user identifies this copy as May 2009. This is a pasted text transcript, not a byte-for-byte archived HTML snapshot or a recovered copy of the former index page. The Apache-hosted specifications are also preserved; their own headers describe them as work in progress.
 
 | Local file | Original source | Read for |
 | --- | --- | --- |
@@ -22,6 +35,7 @@ Source archive: [Apache Wave whitepapers](https://svn.apache.org/repos/asf/incub
 | [Federation HTML](specs/federation/wavespec.html) | [Apache](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html) | Hosted shared state, operations, server-to-server exchange |
 | [Federation text](specs/federation/wavespec.rst) | [Apache](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.rst) | Agent-readable original source |
 | [Federation schema](specs/federation/waveschema.rnc) | [Apache](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/federation/waveschema.rnc) | Formal wire schema, supplementary rather than required reading |
+| [May 2009 Wayback transcript](specs/federation/draft-protocol-spec-wayback-transcript.txt) | User-supplied text from Wayback Machine page `http://www.waveprotocol.org/draft-protocol-spec` | Early XMPP request/delta draft; selected capture date is known only as May 2009 |
 | [Client/server HTML](specs/client-server-protocol/client-server-protocol.html) | [Apache](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/client-server-protocol/client-server-protocol.html) | Prototype client/server interaction |
 | [Client/server text](specs/client-server-protocol/client-server-protocol.rst) | [Apache](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/client-server-protocol/client-server-protocol.rst) | Agent-readable original source |
 

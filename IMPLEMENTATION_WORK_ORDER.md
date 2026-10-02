@@ -1,8 +1,8 @@
-# Work order: a recognizable ANProto Wave prototype
+# Work order A: Automerge-backed ANProto Wave prototype
 
 Date: 22 September 2026
 
-Status: implementation handoff, not an implementation already completed. This document authorizes no changes outside this project. The user will hand it to an implementation agent later.
+Status: superseded architecture option, retained for comparison and for the shared product requirements and acceptance scenario. The decision is to investigate and build an ANProto-specific CRDT; use the [custom CRDT work order](CUSTOM_MERGE_WORK_ORDER.md) for the current implementation direction. The Automerge instructions in this document are not an implementation mandate. This document authorizes no changes outside this project.
 
 Historical baseline: Google Wave's developer preview was unveiled at Google I/O on May 28, 2009. The collected follow-up sessions are from 2010, not 2011. Use the [verified chronology](GOOGLE_WAVE_RESEARCH.md#verified-chronology) and original references for historical claims. This work order's CRDT, ANProto, relay, and fixed-membership choices are our proposed design, not Google's historical specification.
 
@@ -99,6 +99,8 @@ Identify participants by key even when names or photos match. Label profile name
 
 ## 6. Architecture decisions
 
+The historical federation protocol is context, not a blueprint for this implementation. Google's May 2009 draft describes a single authoritative server per wave; the later July 2009 Apache-hosted draft specifies a host per wavelet that orders/transforms operations and federates copies. This work order proposes Automerge convergence with a relay that stores and forwards signed records. The relay must not silently become an ordering authority. ANProto's portable, independently verifiable authorship and integrity guarantees are required by the product; signatures still do not by themselves grant access. This prototype deliberately keeps fixed membership and public data; it does not implement federation, private wavelets, or confidentiality. The alternative is a purpose-built merge algorithm in [Work order B](CUSTOM_MERGE_WORK_ORDER.md). See [the draft comparison](GOOGLE_WAVE_RESEARCH.md#the-may-and-july-2009-federation-drafts).
+
 ### A. Use a maintained text collaboration engine
 
 Use an established text CRDT implementation with supported stable/relative positions and a browser editor binding. Do not hand-roll OT or a character CRDT for this work order. Plain text is sufficient; a dependable editor binding is more important than retaining zero dependencies.
@@ -112,6 +114,8 @@ CRDT convergence is not semantic agreement: simultaneous prose can still need hu
 ### B. Keep ANProto around durable contributions
 
 Continue using the existing ANProto signing primitives. A v2 contribution signs the hash of its exact serialized payload bytes. Verify the original bytes before interpreting them; do not parse and reserialize imported payloads before checking the signature.
+
+Treat portable authorship as a product guarantee: an exported durable contribution must be independently verifiable without the original relay, Automerge Repo instance, or Keyhive service. Bind each contribution to its wave/blip, payload format, exact Automerge update bytes (or other semantic payload), and causal context. Use bounded update batches rather than signing each keystroke. If Keyhive is added later, explicitly bind each Keyhive identity to the ANProto signing key; never infer that the two keys represent the same author. Keyhive can grant or revoke access, but it cannot replace the required ANProto verification record.
 
 Define a versioned protocol in `PROTOCOL.md`, with exact field types, limits, record IDs, dependency rules, invalid-record handling, and executable examples. At minimum define:
 

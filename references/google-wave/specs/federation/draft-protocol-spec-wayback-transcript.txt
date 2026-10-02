@@ -1,0 +1,620 @@
+
+Wayback Machine
+http://www.waveprotocol.org/draft-protocol-spec
+72 captures
+31 May 2009 - 17 Feb 2026
+Apr	MAY	Jul
+31	
+2008	2009	2010
+  
+ About this capture
+Logo	
+ 
+Search Site
+Introduction
+Community Principles
+Draft Protocol Spec
+Whitepapers
+Get Involved
+Patent License
+Sitemap
+Google Wave APIs
+For information about how to extend Google Wave's client, or simply embed waves in your own site, check out the Google Wave APIs.
+Draft Protocol Spec
+Below you'll find the draft Google Wave Federation Protocol, and the canonical copy is maintained in Subversion hosted at: http://code.google.com/p/wave-protocol/. The intellectual property related to this protocol is licensed under a liberal patent license. If you'd like to contribute to the specification, please review the community principles.
+
+Please note this is a very early draft. A number of areas are known to be underspecified (such as which errors to return when, etc) or in the midst of editing.  However, we welcome comments and discussion about it!
+
+Google Wave Federation Protocol
+Abstract
+
+ 
+Table of Contents
+1.  Introduction
+    1.1.  Overview
+    1.2.  Terminology
+2.  Generalized Architecture
+    2.1.  Wavelets
+    2.2.  Documents
+    2.3.  Operations
+    2.4.  Client vs server in the wave federation architecture
+    2.5.  Wave ownership and server authority
+3.  User ids
+4.  Connection initiation
+5.  Operation transfer
+6.  IQ based requests
+    6.1.  Common attributes
+        6.1.1.  wave-id
+        6.1.2.  wave-domain
+        6.1.3.  wavelet-id
+        6.1.4.  wavelet-domain
+    6.2.  Request element
+        6.2.1.  Request element attributes
+        6.2.2.  Request element semantics
+    6.3.  Delta element
+        6.3.1.  Delta element attributes
+        6.3.2.  Delta element semantics
+        6.3.3.  Successful delta example
+        6.3.4.  Unsuccessful delta example
+    6.4.  Wavelet operation serialization
+        6.4.1.  noop
+        6.4.2.  submitdocument
+        6.4.3.  addparticipant
+        6.4.4.  removeparticipant
+        6.4.5.  documentcontentmutation
+7.  Normative References
+Appendix A.  Protocol Schema
+§  Author's Address
+
+
+ 
+ TOC 
+ 
+1.  Introduction
+ 
+ TOC 
+ 
+1.1.  Overview
+The Google Wave Federation Protocol is an open extension to XMPP core [RFC3920] protocol to allow near real-time communication between two wave servers. This document in particular defines the wire protocol used to communicate between these servers. In addition to this document, one should read the architecture overview and operational transform documents.
+
+ 
+ TOC 
+ 
+1.2.  Terminology
+The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14, RFC 2119 [TERMS].
+
+ 
+ TOC 
+ 
+2.  Generalized Architecture
+Waves are a new medium for communication that could be described as a new form of multi-user document. Conceptually, waves do not exist themselves, instead being made up of a set of one or more wavelets which in turn contain one or more documents. A wave is visualised to participants primarily through display of its root conversation wavelet, which is discovered through convention (wavelet of ID '<waveid>~conversation/root'). Users become notified of wavelets by being added as participants, ala being invited to edit and participate in a multi-user document. It is also worth noting that wavelets have create-on-use semantics, and as such, users must create a new wave by adding themselves to its (currently non-existant) root wavelet.
+
+ 
+ TOC 
+ 
+2.1.  Wavelets
+While the root conversation wavelet of any wave should be located on the WSP indicated through parsing of the wave ID (ala '<domain>:w/<id>', e.g. 'gwave.com:w/fXd23kLp'), further wavelets inside a wave may be hosted on any WSP. The most obvious reasoning for this choice is that a user should primarily contain data - that may only be most relevant to them - within their own WSP. This is most notably the case in terms of private replies, which allow a subset of wave participants to interact privately within the already visualised wave. Private wavelets may also be used for internal participant storage; for example, to store information about what parts of a wave this user has already read.
+
+ 
+ TOC 
+ 
+2.2.  Documents
+Each wavelet is a container for any number of uniquely named XML documents. This set of documents are authoritatively located on the WSP that provides the given wavelet, and can not span between providers or be rehomed into alternative wavelets. To support this idiom, any single document operation may only target a single wavelet. The actions within this operation may optionally effect a single part of the contained set, but can not effect documents outside the target wavelet.
+
+For background, however, a wavelet will contain a root document along with potentially any number of other documents arranged in a heirarchical-like conversation structure.
+
+ 
+ TOC 
+ 
+2.3.  Operations
+While documents and wavelets exist conceptually, they are made concrete only through wave operations. Wave operations are discrete delta operations that, when composed, produce a set of wavelets and documents.
+
+Operations are also the basic unit used in concurrency control for waves. Concurrency control in waves is done by transformation of incoming operations.
+
+ 
+ TOC 
+ 
+2.4.  Client vs server in the wave federation architecture
+In the wave federation architecture, the distinction between a client and a server is only used to distinguish which side initiates the connection. Servers will end up being clients to other servers in order to transmit wavelet operations, and servers for other clients, in order to receive wavelet operations.
+
+An example set of events and resulting connections for a wave to illustrate these dualities:
+
+
+ 
+Example when a server receives a delta operation from a client that needs to be applied to a wave it is not authoritative for
+
+Non-Authoritative         Authoritative
+    Server                   Server
+-----------------         -------------
+     |                          |
+     |  establish connection    |
+     |  --------------------->  |
+     |                          |
+     |  send delta operation    |
+     |  --------------------->  |
+     |                          |
+     |  receive response        |                  All non-authoritative
+     |  <---------------------  |                      servers with
+                                |                      participants
+                                |                      ----------
+                                |  establish connection   |
+                                |  -------------------->  |
+                                |                         |
+                                |  send delta operation   |
+                                |  -------------------->  |
+                                |                         |
+                                |  receive response       |
+                                |  <--------------------  |
+ Figure 1 
+As the example shows, a given wave server can sometimes be a client, and sometimes be a server in this protocol.
+
+ 
+ TOC 
+ 
+2.5.  Wave ownership and server authority
+The operational transform used for concurrency control in wave is [currently] based on mutation of a shared object owned by a central master. As a result, in order to achieve federation while still respecting the concurrency control protocol, only one server may 'own', or be 'authoritative' for a given wave (and its operations), regardless of whether the participants use different service providers.
+
+It is implied and expected that a wave server may not be authoritative for all waves it currently knows about, or that users are participants in.
+
+The wave server where the wave is created (IE that has the first operation) is considered the authoritative source of operations for that wave.
+
+The concurrency control protocol will be distributed at some point in the future, but for now, this means the federation protocol resolves around authoritative servers sending operations to other non-authoritative servers (mirroring the authoritative version of the wave), and non-authoritative servers sending operations received from clients to the authoritative server in order to be processed. The protocol described in this document is geared towards enabling this to happen.
+
+ 
+ TOC 
+ 
+3.  User ids
+A wave user is identified by an address resembling an email address, '<username>@<domain name>'. The domain name points to a wave service provider which is authoritative for the user namespace.
+
+ 
+ TOC 
+ 
+4.  Connection initiation
+As an XMPP extension, this protocol expects a bidirectional stream to be established according to the XMPP core specification.
+
+The connection MUST be secured using the TLS feature of XMPP.
+
+ 
+ TOC 
+ 
+5.  Operation transfer
+The authoritative wave server for a given wave is responsible for federating the operations for that wave to external participants. To that end, for each external participant in a wave, the authoritative wave server MUST initiate connections to the external server responsible for that participant, and transmit operations to the external sever as it receives operations.
+
+A non-authoritative wave server for a given wave MUST initiate connections to the authoritative wave server and transmit received client operations to, and report any errors back to teh client (in effect, acting as a proxy between the client and the authoritative wave server).
+
+ 
+ TOC 
+ 
+6.  IQ based requests
+The Google Wave Federation Protocol defines a set of elements that occur in XMPP <iq> stanzas. These elements are, in effect, wave protocol messages, and are used to transfer wave operations and report results. All of these elements MUST be supported by an Google Wave Federation Protocol implementation
+
+The two types of messages that the wave protocol defines are
+
+Request Message
+Delta Element
+These messages have a small set of common attributes that are shared between them.
+
+ 
+ TOC 
+ 
+6.1.  Common attributes
+The following are attributes common to all messages defined below:
+
+ 
+ TOC 
+ 
+6.1.1.  wave-id
+The REQUIRED 'wave-id' attribute specifies the unique id portion of the wave identifier the message's operation is intending to operate on.
+
+ 
+ TOC 
+ 
+6.1.2.  wave-domain
+The REQUIRED 'wave-domain' attribute specifies the hostname portion of the wave identifier the message's operation is intending to operate on.
+
+ 
+ TOC 
+ 
+6.1.3.  wavelet-id
+The REQUIRED 'wavelet-id' attribute specifies the unique id portion of the wavelet identifier the message's operation is intending to operate on.
+
+ 
+ TOC 
+ 
+6.1.4.  wavelet-domain
+The REQUIRED 'wavelet-domain' attribute specifies the hostname portion of the wave identifier the message's operation is intending to operate on.
+
+ 
+ TOC 
+ 
+6.2.  Request element
+The request message is used to request historical delta operations from a server. These messages are represented in XMPP through a <request> element. It MUST be used with an <iq> element of type 'get'.
+
+ 
+ TOC 
+ 
+6.2.1.  Request element attributes
+In addition to the common attributes, the request element MUST contains two additional attributes:
+
+The REQUIRED 'start' attribute defines the beginning of the range of versions for which delta operations are being requested.
+
+The REQUIRED 'end' attribute defines the end of the range of versions for which delta operations are being requested.
+
+ 
+ TOC 
+ 
+6.2.2.  Request element semantics
+Normally, the first operation a wave server will see for a non-locally hosted wave is an add participant operation for some participant on that wave-server. In order to have a complete set of operations for the wave, the wave server will need to request the earlier operations from the authoritative wave server using the request element.
+
+Additionally, the request messages may be used as a recovery mechanism in case operations from the authoritative server have been lost due to some catastrophic failure.
+
+Implementations MUST implement the operational transform method to handle concurrency. The request message is not meant to be used as part of a method of concurrency control.
+
+The following rules apply to request elements:
+
+The 'wavelet-id' attribute is REQUIRED for request elements
+The 'start' attribute is REQUIRED for request elements
+The 'end' attribiute is REQUIRED for request elements
+The numeric value of the 'start' attribute MUST be less than the numeric value of the 'end' attributed
+The receiving entity MUST validate that the requesting entity should have access to these operations before returning them. More on this can be found in the Access control whitepater.
+On receiving a request message, the receiving entity MUST reply with an <iq> stanza of type 'result' containing the wave operations request, or an <iq> stanza of type 'error' containing error information
+A request must succeed or fail as a whole. A server MUST NOT return only some of the operations requested (e.g. if a request is made for a range of ops that is invalid, a server MUST NOT return a partial response consisting of the valid portion of the range)
+
+ 
+ TOC 
+ 
+6.2.2.1.  Successful request example
+An example of a client making a request for 10 historical operations looks like this:
+
+Step 1: Client issues a request for 10 operations
+
+<iq id='19' from='user@wave.com/waveserver'
+    to='user@otherwave.com/waveserver' type='get'>
+      <request wave-id='a12f4d'
+               wave-domain='wave.com'
+               wavelet-id='f42cdL'
+	       wavelet-domain='wave.com'
+               start='0' end='10'
+               xmlns='urn:google:wave:requests'/>
+</iq>
+Step 2: Server hands back 10 operations
+
+<iq id='19' from='user@otherwave.com/waveserver'
+    to='user@wave.com/waveserver'
+    type='result'>
+    <applieddelta xmlns='urn:google:wave:deltas'>
+       <delta>
+         <waveop>...</waveop>
+         <waveop>...</waveop>
+       </delta>
+    </applieddelta>
+</iq>
+ 
+ TOC 
+ 
+6.2.2.2.  Unsuccessful request example
+An example of a client brokenly requesting operations 10-12 follows. Because the client has reversed the start and the end, it will get an error back.
+
+Step 1: Client issues request
+
+<iq id='20' from='user@wave.com/waveserver'
+    to='user@otherwave.com/waveserver' type='get'>
+      <request wave-id='a12f4d'
+               wave-domain='wave.com'
+               wavelet-id='f42cdL'
+	       wavelet-domain='wave.com'
+               start='12' end='10'
+               xmlns='urn:google:wave:requests'/>
+</iq>
+Step 2: Server issues a response
+
+<iq id='20' type='error'>
+  <error type='modify'>
+    <bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+  </error>
+</iq>
+ 
+ TOC 
+ 
+6.3.  Delta element
+The applied delta message is at the heart of the Google Wave Federation Protocol The majority of messages seen by a client or server will be of this form.
+
+These messages are represented using <applieddelta> elements. These contain a <delta> element, which contain one or more serialized wavelet operations as children. These wavelet operations should be applied to the wavelet specified by the 'wavelet-id' attribute, and error or success returned in a proper <iq> stanza. A given wavelet operation MUST be retransmitted if the connection has closed without receiving successful acknowledgement from the receiving entity. Delta elements have the following additional attributes:
+
+ 
+ TOC 
+ 
+6.3.1.  Delta element attributes
+The OPTIONAL 'authoritative' attribute specifies whether the wavelet operations contained in the delta message are from an authoritative wave server.
+
+ 
+ TOC 
+ 
+6.3.2.  Delta element semantics
+The following rules apply to delta elements:
+
+The 'wave-id' attribute is REQUIRED for delta elements
+The 'wavelet-id' attribute is REQUIRED for delta elements
+A delta element MAY contain more than one operation
+The receiving entity MUST verify the order tag
+The delta element MUST contain only operations for the wavelet specified in the 'wavelet-id' attribute.
+The receiving entity MUST verify the requesting entity is allowed to submit operations to this wave.
+A non-authoritative server for a wavelet entity MUST only send untransformed operations to the authoritative wave server.
+On receiving a valid delta element, if the server is the authoritative for this wave, the server MUST apply concurrency control as specified in the operational transform documentation to the operations.
+The receiving server MUST issue an approriate response message in response to a delta request
+
+ 
+ TOC 
+ 
+6.3.3.  Successful delta example
+An example where a client is sent a delta message by a wave server, and successfully processes it, follows:
+
+Step 1: Client is sent delta
+
+<iq id='21' from='user@wave.com/waveserver'
+    to='user@otherwave.com/waveserver' type='set'>
+    <delta wave-id='wave.com:w/f42cdL'
+           wavelet-id="f12cdf42cdL" authoritative='true'
+           order-tag='de9f2c7fd25e1b3afad3e85a0bd17d9b100db4b3'
+	   verification-tag="f919211828218213812381238123'>
+      <waveop> ... </waveop>
+      <waveop> ... </waveop>
+    </delta>
+</iq>
+Step 2: Client sends a successful ack
+
+<iq id='21' type='result'/>
+ 
+ TOC 
+ 
+6.3.4.  Unsuccessful delta example
+An example where the client is sent a delta from a server without access to that wave follows:
+
+Step 1: Client receives an invalid delta message
+
+<iq id='22' from='user@wave.com/waveserver'
+    to='user@otherwave.com/waveserver' type='set'>
+    <delta wave-id='wave.com:w/f42cdL'
+           wavelet-id="f12cdf42cdL" authoritative='true'
+           order-tag='de9f2c7fd25e1b3afad3e85a0bd17d9b100db4b3'
+	   verification-tag="f919211828218213812381238123'>
+      <waveop> ... </waveop>
+      <waveop> ... </waveop>
+    </delta>
+</iq>
+Step 2: Client sends an error response
+
+<iq id='22' type='error'>
+  <error type='auth'>
+     <forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+  </error>
+</iq>
+ 
+ TOC 
+ 
+6.4.  Wavelet operation serialization
+Wavelet operations are serialized into XML as a tree of XML elements. The top level element for any wavelet operation is an 'waveop' element.
+
+The REQUIRED 'order-tag' attribute specifies a cryptographic order tag to ensure integrity of the messages. Please see General Verifiable Federation for information on how to generate this field
+
+The REQUIRED 'verification-hint' attribute specifies a cryptographic verification hint to ensure integrity. Please see General Verifiable Federation for information on how to generate this field
+
+The <waveop> element is simply a container element, and MUST contain ONE of the following elements:
+
+ 
+ TOC 
+ 
+6.4.1.  noop
+The <noop> element is used to indicate a blank operation. It has no attributes and no child elements.
+
+ 
+ TOC 
+ 
+6.4.2.  submitdocument
+The <submitdocument> element is used to signal that a document was submitted by the user. The main use of the submit document element is to mark points in the operation stream where playback should stop.
+
+ 
+ TOC 
+ 
+6.4.3.  addparticipant
+The <addparticipant> element is used to add a participant to a wave. It has one attribute, the REQUIRED 'user-id' attribute, which specifies the user id of the participant.
+
+The receiving entity MUST verify the user id is allowed to be added to the wave. To achieve this, the receiving entity MUST ensure the 'from' attribute specifies a current participant of the wave, and that the 'from' attribute specifies a user that the sending entity is allowed to be authoritative for (CLEAN UP THIS LANGUAGE)
+
+ 
+ TOC 
+ 
+6.4.4.  removeparticipant
+The <removeparticipant> element is used to add a participant to a wave. It has one attribute, the REQUIRED 'user-id' attribute, which specifies the user id of the participant.
+
+The receiving entity MUST verify the user id is allowed to be added to the wave. To achieve this, the receiving entity MUST ensure the 'from' attribute specifies a current participant of the wave, and that the 'from' attribute specifies a user that the sending entity is allowed to be authoritative for (CLEAN UP THIS LANGUAGE)
+
+ 
+ TOC 
+ 
+6.4.5.  documentcontentmutation
+The <documentcontentmutation> element is used to specify a modification of a document's textual content.
+
+ 
+ TOC 
+ 
+6.4.5.1.  Content mutation semantics
+Content mutations for a document operation operate on a theoretical XML text document with a current operation point. This current operation point is also referred to as the 'cursor'. Much like the cursor in a text editor, this specifies where the next operation in the stream should be applied. The cursor begins at position zero. 'documentskip' operations are used to explicitly modify the current operation point, and the remainder of the operations are used to modify the actual textual content of the document, however these other operations may also implicitly effect the location of the current operation point.
+
+Note that the cursor treats every start-tag and end-tag within the XML as having a character length of one. For example, if a cursor is located before the start-tag <blip> and is moved forward by one, it will now be located immediately after this start-tag <blip>.
+
+Internally, XML documents within wave MUST NOT contain the empty-element tag, i.e., a merged start and end tag. That is, the tag <foo /> is disallowed, and MUST be stored as <foo></foo>. This is even the case for tags which would normally be represented as an empty-element, such as <br />.
+
+It should be understood that this encoding is in no way assumed to be the most efficient way to encode XML documents as a set of operations. It is in fact, quite wasteful space-wise. However, the document operations specified below are easily composable and transformable, which is a requirement for concurrency control transforms. They also are used to accurately represent the history of the document for playback (which is why there are deletecharacters elements, etc). More efficient encodings of these operations will be explored as the process of drafting this document continues.
+
+ 
+ TOC 
+ 
+6.4.5.2.  Content mutation elements
+A content mutation consists of one or more of the following child elements:
+
+The <documentskip> element is used to specify portions of the document that are not modified by the content mutation. It has one REQUIRED attribute, 'size', which specifies the number of characters since the last mutation operation to skip before applying the next mutation operation. As a result, this element is used to modify the current operation point for the next content mutation operation.
+
+The <documentcharacters> element is used to specify text additions to the document. It has one REQUIRED attribute, 'characters', which specifies the characters to be added to the document at the current insertion point. After this operation, the cursor will be located after the inserted characters.
+
+The <documentelementstart> element is used to specify the beginning of a tagged element in the document. It has one REQUIRED attribute, 'name', which specifies the tag name of the element to be added to the document at the current insertion point. The <documentelementstart> element can OPTIONALLY have any number of children used to specify attributes for this element. These children are <attribute> elements, which have two REQUIRED attributes, 'name' and 'value', specifying the name and value of the attribute for the element, respectively. After this operation, the cursor will move forward one step, i.e., after the newly inserted start-tag.
+
+The <documentelementend> element is used to specify the end of a tagged element. It is REQUIRED that every <documentelementstart> element have a matching <documentelementend> element. After this operation, the cursor will move forward one step, i.e., after the newly inserted end-tag.
+
+The <antidocumentelementstart> element is used to specify the beginning of a "split" element in the document. It takes NO attributes. Functionally, it will insert an end-tag element which matches with the nearest start-tag to the left of the cursor. It will also move the cursor one position forward, after this inserted end-tag.
+
+The <endantidocumentelementstart> element is used to specify the end of a split element in the document. The <endantidocumentelementstart> can OPTIONALLY have any number of children used to specify attributes for this element. These children are <attribute> elements, which have two REQUIRED attributes, 'name' and 'value', specifying the name and value of the attribute for the element, respectively. After this operation, the cursor will move forward one step, i.e., after the newly inserted start-tag. This element MUST be paired with a <antidocumentelementstart> element.
+
+The <documentdeletecharacters> element is used to specify text deletions from the document. It has one REQUIRED attribute, 'size', which specifies the number of characters to be deleted from the document. This operation deletes characters AFTER this cursor, and does not modify the cursor location. All deletion operations will, of course, immediately reduce the total length of the document.
+
+The <documentdeleteelementstart> indicates the deletion of the start-tag directly under the cursor. i.e., the position directly after the cursor. It MUST be paired with a later <documentdeleteantielementend>. This pairing - on its own - MUST NOT delete the textual content between these two points. The cursor does not move as a result of this operation. Again, this operation will reduce the total length of the document. A notable side effect of this is that deleting a matching start-tag and end-tag, which are next to each other, requires two delete operations and NO cursor moves.
+
+The <documentdeleteelementend> indicates the deletion of the end-tag directly under the cursor. It MUST be paired with a previous <documentdeleteelementstart>. The cursor does not move as a result of this operation.
+
+The <documentdeleteantielementstart> indicates the deletion of the end-tag directly under the cursor. It MUST be paired with a later <documentdeleteantielementend> containing the same tag, at the same tree level within the XML document. The cursor does not move as a result of this operation.
+
+The <documentdeleteantielementend> indicates the deletion of an start-tag directly under the cursor. It MUST be paired with a previous <documentdeleteantielementstart> element containing the same tag. The cursor does not move as a result of this operation.
+
+The <documentsetattributes> element is used to set XML attributes on the start-tag (e.g. <blip>) directly under the cursor. It first MUST clear all previous attributes on this start-tag. It then MUST iterate through the OPTIONAL set of child <attribute> elements and apply their key/value pairs as attributes to the start-tag.
+
+The <documentupdateattributes< element is used in the same way as <documentsetattributes>, except that it does not first clear attributes, and only updates the attributes on the start-tag. Note that if the 'value' attribute of an <attribute> is NOT set, then this indicates the deletion of the named attribute.
+
+The <documentstartannotation< begins the mark-up of a ranged annotation, an extension to XML used within the Google Wave Federation Protocol. This annotation is uniquely identifed by a key and may span across normal XML tag boundaries. It has one REQUIRED attribute, 'key', and one OPTIONAL attribute, 'value'. If the value is NOT set, then this denotes the deletion of a ranged annotation.
+
+The <documentendannotation< denotes the end of a ranged annotation, and contains a single attribute of 'key'. This pairs the end of this annotation with the previous <documentstartannotation>
+
+ 
+ TOC 
+7. Normative References
+[RFC3920] 	Saint-Andre, P., Ed., “Extensible Messaging and Presence Protocol (XMPP): Core,” RFC 3920, October 2004 (TXT, HTML, XML).
+[TERMS] 	Bradner, S., “Key words for use in RFCs to Indicate Requirement Levels,” BCP 14, RFC 2119, March 1997 (TXT, HTML, XML).
+ 
+ TOC 
+ 
+Appendix A.  Protocol Schema
+The protocol schema, as RelaxNG compact:
+
+## Represents our two possible IQ children
+start = delta | request
+
+## Wave id's are split into two pieces, the unique id and the domain name
+waveid =
+  attribute wave-id { xsd:string }
+  & attribute wave-domain { xsd:string }
+
+## Wavelet id's are split into two pieces, the unique id and the domain name
+waveletid =
+  attribute wavelet-id { xsd:string }
+  & attribute wavelet-domain { xsd:string }
+
+## These are the attributes common to all our elements
+commonattributes = waveid & waveletid
+
+## Request for historical wave operations
+request =
+  element request {
+    commonattributes,
+    attribute start { xsd:integer },
+    attribute end { xsd:integer }
+  }
+
+## A delta between two wavelet versions.
+## This element is sent as both a standalone request (IE i have a delta for you),
+## and as part of the response to a <request> (IE here are the delta's you requested)
+delta =
+  element delta {
+    commonattributes,
+    attribute transformed { xsd:boolean },
+    waveop+
+  }
+
+## Used to represent an XML attribute inside an XML element that is embedded in a wave
+singleattribute =
+  element attribute {
+    attribute name { xsd:string },
+    attribute value { xsd:string }
+  }
+
+## Used to specify which XML attribute is being updated. Empty value
+## implies deletion.
+
+updateattribute =
+  element attribute {
+    attribute name { xsd:string },
+    attribute value { xsd:string }?
+  }
+
+## Serialization of a wave operation
+waveop =
+  element waveop {
+    attribute order-tag { xsd:string },
+    attribute verification-hint { xsd:string },
+    (element addocument {
+
+       ## Identifier of the document being added
+       attribute document-id { xsd:string },
+
+       ## Optional parent identifier for the document being added
+       attribute parent-id { xsd:string }?
+     }
+     | element tombstonedocument {
+
+         ## Identifier of the document being removed
+         attribute document-id { xsd:string }
+       }
+     | element submitdocument { empty }
+     | element addparticipant {
+
+         ## User id being added to the wave
+         attribute user-id { xsd:string }
+       }
+     | element removeparticipant {
+
+         ## User id being removed from the wave
+         attribute user-id { xsd:string }
+       }
+     | element documentcontentmutation {
+         element skip {
+
+           ## Number of characters to move the insertion point forward
+           attribute size { xsd:integer }
+         }
+         | element characters {
+
+             ## Actual characters
+             attribute characters { xsd:string }
+           }
+         | element deletecharacters {
+
+             ## Number of characters to delete forward
+             attribute size { xsd:integer }
+           }
+         | element elementstart {
+
+             ## Name of XML element
+             attribute name { xsd:string }
+           }
+         | element elementend { empty }
+         | element antielementstart { empty }
+         | element antielementend { singleattribute* }
+         | element deleteelementstart { empty }
+         | element deleteleementend { empty }
+         | element deleteantielementstart { empty }
+         | element deleteantielementend { empty }
+         | element setattributes { singleattribute* }
+         | element updateattributes { updateattribute* }
+         | element startannotation { singleattribute }
+         | element endannotation {
+
+             ## Name of annotation this end pairs with
+             attribute name { xsd:string }
+           }
+       })+
+  }
+ 
+ TOC 
+Author's Address
+ 	Daniel Berlin (editor)
+ 	Google, Inc.
+Email: 	dannyb@google.com
+  Sign in   Terms   Report Abuse   Print  |  Powered by Google Sites

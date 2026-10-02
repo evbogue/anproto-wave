@@ -100,7 +100,7 @@ Anchored discussion introduces a second problem: references must survive editing
 
 ## 4. The relationship between history and current state
 
-**Documented.** In the federation design, a wavelet's state was determined by its operations. Providers exchanged changes and applied them to their copies. The host validated and ordered submissions and reconciled concurrency. Other providers held copies and sent changes to that host. [Federation specification](https://svn-eu.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html)
+**Documented.** In the later federation design, a wavelet's state was determined by its operations. Providers exchanged changes and applied them to their copies. The host validated and ordered submissions and reconciled concurrency. Other providers held copies and sent changes to that host. [July 2009 Apache federation specification](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html)
 
 **Our interpretation.** A useful distinction is between an action someone attempts and a change the workspace accepts. Receiving a signed object is insufficient to establish that the action was permitted, based on valid context, or compatible with other work.
 
@@ -121,7 +121,7 @@ We should also distinguish local optimism from shared acceptance. A person may s
 
 ## 5. Concurrency is a product rule as well as an algorithm
 
-**Documented.** Google used operational transformation to reconcile concurrent operations. Its federation specification required equivalent transformation behavior across interoperating implementations. [Federation specification](https://svn-eu.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html)
+**Documented.** Google used operational transformation to reconcile concurrent operations. The July 2009 federation draft required equivalent transformation behavior across interoperating implementations. [Federation specification](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html)
 
 **Our interpretation.** We can choose a different mechanism, but we cannot leave concurrent behavior undefined.
 
@@ -138,7 +138,7 @@ Several cases have distinct requirements:
 
 Identical final state is only one success condition. A system can converge consistently while surprising its users or losing meaningful intent. We need tests for both agreement and understandable outcomes.
 
-No decision about OT, CRDTs, a designated coordinator, or explicit revision acceptance has been made here. Those are candidate mechanisms to evaluate against the behavior we want.
+This historical analysis did not itself select a mechanism. The later project decision is to investigate and build an ANProto-specific CRDT; its precise merge rules still require validation against the behavior we want.
 
 ## 6. Playback, restoration, and accountability
 
@@ -221,7 +221,24 @@ A public preview also needs an explicit boundary: showing a selected result is d
 
 ## 11. Federation and portability are different promises
 
-**Documented.** The federation design retained a host for each wavelet even while other providers stored copies and participated. We should not describe that design as having no coordinating authority. [Federation specification](https://svn-eu.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html)
+**Documented.** The July 2009 Apache-hosted federation draft retained a host for each wavelet even while other providers stored copies and participated. That host transformed and validated incoming operations, then distributed applied operations to other providers. We should not describe that design as having no coordinating authority. [Federation specification](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html)
+
+### The May and July 2009 federation drafts
+
+The May 2009 Wayback transcript and the July 2009 Apache-hosted document are distinct snapshots of the federation protocol, not two names for one unchanged specification. The older copy is preserved locally as a text transcript; the Wayback toolbar does not expose an exact timestamp for that selected capture. The July document is the later Apache-hosted draft, dated July 2009. The Apache Wave protocol page was last updated in 2013 and links to these specifications; the project is now retired. [May 2009 transcript](references/google-wave/specs/federation/draft-protocol-spec-wayback-transcript.txt) · [July 2009 Apache text](references/google-wave/specs/federation/wavespec.rst) · [Apache protocol-specifications page](https://cwiki.apache.org/confluence/spaces/WAVE/pages/31823357/Protocol%2BSpecifications)
+
+| Topic | May 2009 draft | July 2009 Apache draft |
+| --- | --- | --- |
+| Authority | Describes one authoritative server for a wave, which orders operations. | Makes the host/provider relationship explicit for each wavelet; the host transforms and validates operations while other providers keep copies. |
+| Topology | Introduces wavelets and allows additional wavelets, including private replies, to be hosted by providers. | Specifies provider roles and local/remote wavelet views, including restricted participant sets for private wavelets. |
+| Transport | Defines XMPP `request` and `delta` elements, with wave/wavelet ID fields and requested operation ranges. | Defines XMPP message stanzas for pushed updates and PubSub service requests for history, submissions, and signer operations. |
+| History and delivery | Supports requesting historical operations; the draft has fewer delivery details. | Adds version/history hashes, commit notices, receipts, persistent delivery queues, and reconnect/retry behavior. |
+| Operations and documents | Lists a small operation vocabulary including participant changes and document content mutations. | Expands the XML-like document/annotation operation model and includes protocol-buffer delta definitions. |
+| Authentication | Requires TLS for the XMPP connection. | Adds signer and certificate exchange. Its text says the intended cryptographic attribution techniques were not yet fully implemented or incorporated. |
+
+**Interpretation.** Between these snapshots the protocol became much more explicit about server-to-server federation and reliable operation delivery. Its core remains a centrally ordered OT design: the host of a wavelet accepts, transforms, and validates submissions. The July draft says interoperating implementations must use functionally equivalent OT and composition algorithms. It is historical context, not a design requirement for ANProto Wave.
+
+**Our design distinction.** The project has chosen to investigate and build an ANProto-specific CRDT over signed events. ANProto records carry durable contributions, and a loopback relay stores and forwards them. This has different trust boundaries from Google's host-ordered OT: the relay is not intended to order or transform document changes, and signatures alone do not establish permission. The first prototype keeps fixed membership and public data as explicit scope limits; it does not reproduce Wave's federation, private wavelets, or access-control guarantees. See the [architecture decision record](ARCHITECTURE_COMPARISON.md).
 
 On November 9, 2010, Google announced ZIP exports of a wave's current view and attachments. On November 22, 2011, it announced the hosted-service shutdown schedule described above. Those announcements do not establish a complete export preserving every interactive behavior and historical operation. [Export announcement](https://googlewave.blogspot.com/2010/11/exporting-your-waves.html) · [Shutdown schedule](https://googlewave.blogspot.com/2011/11/final-steps-for-google-wave.html)
 
@@ -239,9 +256,13 @@ For ANProto Wave, preserving authorship and enabling continued work are especial
 
 ## 12. What ANProto and SSB could contribute
 
-This section is a provisional mapping based on our project discussions, not a conclusion reached by Google's designers.
+This section is a mapping for ANProto Wave, not a conclusion reached by Google's designers.
 
-ANProto could authenticate contributions and references independently of a particular transport. We would still need to define the signed payload's meaning, its relationship to a document revision, and how permission is established.
+**Product decision.** ANProto's portable authorship and integrity guarantees are required. Durable contributions must remain independently verifiable when copied, exported, or moved between relays; verification must not depend on trusting the relay or on Keyhive being available. The signed format must bind the exact contribution bytes to the author's key and a stable content-derived record ID. It does not prove that the key belongs to a named person, grant access, establish global order, or make the contribution true or safe.
+
+If Keyhive is adopted, it supplies document membership, delegation, and encryption; it does not replace ANProto's signed application-level contribution records. The system must explicitly bind each Keyhive identity to its ANProto signing identity and reject ambiguous or mismatched bindings. Permission checks and cryptographic authorship verification remain separate checks.
+
+For collaborative text, define a signed contribution envelope around each bounded CRDT operation batch. It should identify the wave and blip, the exact serialized operation bytes, the relevant causal heads, and the format/version. Do not sign each keystroke. Clients verify the signature and membership/permission before applying the update; a valid signature alone is not authorization.
 
 **Documented about SSB.** SSB's database model provides signed append-only feeds associated with individual identities. Application-level changes to existing entities can be represented through later messages. Replication and author history are useful primitives, but application semantics sit above them. [SSB database design](https://github.com/ssbc/ssb-db)
 
@@ -249,11 +270,11 @@ ANProto could authenticate contributions and references independently of a parti
 
 | Concern | Candidate responsibility |
 | --- | --- |
-| Signed contribution | ANProto, or a clearly defined relationship to SSB signatures |
+| Signed contribution and portable authorship | ANProto (required product guarantee) |
 | Distribution and retained author history | SSB or another transport/storage arrangement |
 | Document and conversation meaning | ANProto Wave application protocol |
 | Concurrent state and acceptance | Explicit collaboration rules |
-| Membership and delegated authority | Explicit permission model |
+| Membership and delegated authority | Keyhive or another explicit permission model, bound to the ANProto author key |
 | Media bytes | A storage layer such as AndFS |
 | Rendering and interaction | Shared client components |
 
@@ -309,11 +330,11 @@ A later platform test could involve two people and one agent working on one docu
 
 Our strongest conclusion is that Wave combined editable content, contextual conversation, participant boundaries, recorded change, and programmable collaboration into one environment.
 
-Our strongest correction to the earlier architecture discussion is that signed history and replication are supporting mechanisms. The shared-state rules still need to be designed.
+Our strongest correction to the earlier architecture discussion is that signed history and replication are supporting mechanisms. The shared-state rules still need to be designed and validated in an ANProto-specific CRDT. ANProto's portable signed authorship and integrity are a product requirement; a future access-control layer such as Keyhive remains a separate concern.
 
 This research has not established exact production behavior for every release, comprehensive offline editing, cryptographic confidentiality of private replies, full-fidelity migration, detailed deletion semantics, or a complete permission system. It also does not explain why the product failed; that would require a separate adoption and usability study.
 
-The next document should specify the behavior we want to preserve and the additions we want to make. Only then should we decide which responsibilities belong to ANProto, SSB, AndFS, or another component.
+The next protocol design should specify the signed contribution envelope, causal context, identity binding, access checks, and which responsibilities remain with SSB, AndFS, or another component.
 
 ## Source register
 
@@ -323,7 +344,8 @@ Original sources are preferred. Apache-hosted documents below preserve Google's 
 | --- | --- |
 | [Google launch announcement, May 2009](https://googleblog.blogspot.com/2009/05/went-walkabout-brought-back-google-wave.html) | Product concept and separation of product, platform, protocol; announcement rather than exhaustive specification |
 | [Conversation model, October 2009](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/conversation/convspec.html) | Object vocabulary and relationships; explicitly a developing draft |
-| [Federation specification](https://svn-eu.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html) | Operations, hosting, copies, and concurrency; historical protocol design |
+| [May 2009 federation draft transcript](references/google-wave/specs/federation/draft-protocol-spec-wayback-transcript.txt) | Early XMPP `request`/`delta` protocol and wave-level authority; pasted Wayback text, exact capture timestamp unknown |
+| [July 2009 federation specification](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html) | Later Apache-hosted draft: wavelet hosting, XMPP/PubSub exchange, history, delivery, OT, and signer mechanisms; still marked work in progress |
 | [Client-server whitepaper, May 2010](https://svn-eu.apache.org/repos/asf/incubator/wave/tags/wave-0.4-rc2/whitepapers/client-server-protocol/client-server-protocol.html) | Useful scope warning; explicitly not Google's production web-client protocol |
 | [Google I/O API presentation, May 2009](https://docs.huihoo.com/google/io/2009/T_1200_Programming_With_For_Google_Wave.pdf) | Robot/gadget distinction, examples, API concepts; developer-preview material |
 | [September 2009 preview announcement](https://googleblog.blogspot.com/2009/09/surfs-up-wednesday-google-wave-update.html) | Invitation-preview expansion and contemporary acknowledgment of missing features |

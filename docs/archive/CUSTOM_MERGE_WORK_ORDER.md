@@ -1,8 +1,10 @@
 # Work order: investigate and build an ANProto-specific CRDT
 
+> Archived context. This document preserves earlier research or planning and does not govern current work. See [DIRECTION.md](../../DIRECTION.md) for the product and protocol direction, [ROADMAP.md](../../ROADMAP.md) for next work, and [DESIGN.md](../../DESIGN.md) for the implemented architecture. Paths and instructions in the historical text reflect their original context.
+
 Drafted: 30 September 2026. Direction selected: 2 October 2026.
 
-Status: chosen direction, pending investigation and proof of the merge model. This is a proposed design, not functionality already implemented. The [earlier Automerge work order](IMPLEMENTATION_WORK_ORDER.md) remains a source for the shared product requirements and acceptance scenario, but its engine-specific instructions are superseded.
+Status update (12 October 2026): the narrow CRDT, signed v2 protocol, editor, anchors, loopback relay, and browser acceptance harness are implemented. See [DESIGN.md](../../DESIGN.md), [PROTOCOL.md](../../PROTOCOL.md), and [VERIFICATION.md](../../VERIFICATION.md) for results and limitations. The requirements below are retained as the original work order; tested convergence is not a formal proof. The [earlier Automerge work order](IMPLEMENTATION_WORK_ORDER.md) remains a source for the shared product requirements and acceptance scenario, but its engine-specific instructions are superseded.
 
 ## 1. Objective
 
@@ -14,7 +16,7 @@ Do not make this a generic collaborative JSON engine. Define and implement only 
 
 Before implementing the interface, inventory ANProto's existing record, identity, signing, and replication semantics. Write down the exact text and anchor operations this product needs, then evaluate candidate sequence CRDT rules against concurrent typing, deletes, offline edits, replay, bounded event size, and stable passage anchors. Treat the insertion-run design below as a starting hypothesis, not a frozen wire format.
 
-Produce a small pure reducer, a versioned draft protocol, and reproducible fixtures before expanding the app. Require convergence under every tested delivery permutation, deterministic replay from signed records, stable anchors through edits and deletion, and independent verification of exported contributions. Measure event growth and replay cost. If a proposed rule fails ordinary typing or anchor behavior, revise the model and fixtures first. Record the tradeoffs and unresolved cases in `DESIGN.md` and `PROTOCOL.md`; do not claim the CRDT is proven by a working UI alone.
+Produce a small pure reducer, a versioned draft protocol, and reproducible fixtures before expanding the app. Require convergence under every tested delivery permutation, deterministic replay from signed records, stable anchors through edits and deletion, and independent verification of exported contributions. Measure event growth and replay cost. If a proposed rule fails ordinary typing or anchor behavior, revise the model and fixtures first. Record the tradeoffs and unresolved cases in [DESIGN.md](../../DESIGN.md) and [PROTOCOL.md](../../PROTOCOL.md); do not claim the CRDT is proven by a working UI alone.
 
 ## 3. Core model
 
@@ -68,7 +70,7 @@ Use the two-independent-client acceptance scenario, UI requirements, profile beh
 
 Define a measured performance target for replay and typing latency before implementation; record event count and bytes for the same scripted edit scenario used to evaluate Work order A. If event growth or replay cost is materially worse, report it rather than hiding it behind snapshots.
 
-The deliverables are the working code, tests, `DESIGN.md`, versioned `PROTOCOL.md`, updated README/vendor notes, screenshots, and a limitation report. Keep changes in this repository, do not publish or deploy, and do not modify sibling repositories.
+The deliverables are the working code, tests, [DESIGN.md](../../DESIGN.md), versioned [PROTOCOL.md](../../PROTOCOL.md), updated README/vendor notes, screenshots, and a limitation report. Keep changes in this repository, do not publish or deploy, and do not modify sibling repositories.
 
 ## 9. Stop conditions
 

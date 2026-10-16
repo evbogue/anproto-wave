@@ -1,36 +1,60 @@
 # ANProto Wave
 
-Currently a local shared-notebook demo using ANProto signatures and Wiredove's CSS and avatars.
+We are building ANProto Wave, a browser workspace where partners write messages together, publish them to wider audiences with authorship and contribution credits, and keep improving them as living documents. Encrypted working drafts give authors room to collaborate. Each publication moves an approved revision across the privacy boundary to a chosen audience. Readers can discuss both published messages and work that authors have announced is underway.
 
-## Run
+We are building this experience with simple HTML elements and structural CSS. The first demonstration follows two authors and an audience member across three browser tabs: write together, discuss a closed message, publish, continue editing privately, and publish an update.
+
+The project also develops the protocols behind that experience: local ownership, offline collaboration, signed contributions, deterministic text merging, encrypted access, and distribution across independently operated infrastructure.
+
+## How a Wave works
+
+1. **Write together.** Authors and invited partners edit a shared working draft and reply to passages. Contributions retain their signing identity.
+2. **Announce the work.** Authors can publish a closed-message entry containing a chosen title, collaborator names, and status. The audience can discuss that entry while the draft develops.
+3. **Publish.** Authorized authors release a particular revision, its byline, and selected contribution credits to a chosen audience.
+4. **Keep writing.** Authors continue editing the working draft while readers see the latest publication available to them.
+5. **Publish an update.** A later publication advances the audience's view. Earlier publications and the discussions attached to them remain addressable.
+
+A **revision** identifies a state of a message. An **epoch** identifies a membership and encryption-key state. A **publication** releases a revision and selected attribution to an audience. Publication history and cryptographic epochs advance independently.
+
+## Project guide
+
+- [Direction](DIRECTION.md): product intentions and protocol principles.
+- [Publishing and privacy](PUBLISHING.md): the planned author, audience, encryption, and publication model.
+- [Roadmap](ROADMAP.md): implementation sequence and acceptance evidence.
+- [Design](DESIGN.md): the existing collaboration engine and browser interactions.
+- [Protocol](PROTOCOL.md): the implemented v2 signed-record format and merge rules.
+- [Verification](VERIFICATION.md): dated results for the collaboration foundation and the next verification targets.
+- [Attribution](VENDOR.md): dependency and asset provenance.
+
+## Implementation baseline
+
+The development checkout contains the v2 collaboration foundation: shared text editing, passage replies, signed history, browser persistence, offline work, reconnect, public export/import, and a durable loopback relay. Its records are public and unencrypted, and each Wave has a fixed set of editors. The interface uses native HTML elements and structural CSS. [DESIGN.md](DESIGN.md) records that baseline.
+
+The next implementation milestone adds encrypted drafts, publication records, audience discussion, and distinct author and reader views. [PUBLISHING.md](PUBLISHING.md) describes the intended behavior; [ROADMAP.md](ROADMAP.md) turns it into implementation and verification steps.
+
+## Run the collaboration foundation
 
 ```sh
 npm start
 ```
 
-Open http://127.0.0.1:8098. No installation step or remote services required.
+Open <http://127.0.0.1:8098>. The Node service binds to loopback and saves acknowledged public records in `.wave-data/`. Production dependencies are included in the repository.
 
-Load the two-person example, switch between Alex and Sam, reply, edit a note, inspect history, and resolve the competing revisions. Edit profile to set a name and upload a photo. The example identities are both controlled by this browser.
+Use independent browser profiles for independent signing identities. In each profile, open **Edit profile**, set a self-asserted name, and copy the public key. Create a Wave with the other profile's key in its participant list, then open its share link in that profile on the same local relay. Keep the origin consistent: `127.0.0.1`.
 
-For independent browsers, create an identity in each. Copy the public key shown in Edit profile into the participant list when creating a Wave. Exchange Export files with Import, or copy the exported JSON and use Import pasted notebook. Import merges public signed records and avatar images; private keys are never exported. Keys live in browser storage, so clearing site data loses them. Membership is fixed and all members can edit. Data is public/non-encrypted, with manual exchange only. Storage uses localStorage and is subject to browser quota; a failed save displays an error. Keep exports of important work.
+Add a message, choose **Edit**, and type. Changes are signed, saved locally, and exchanged while typing. **Done** closes the editor. Select a passage and choose **Reply here** to create an inline thread. History shows signed contributions. Concurrent edits converge; authors review the resulting prose together.
 
-Revisions contain complete text, preserving alternatives when edits are concurrent. Reply anchors target a whole note, not a text range. Missing or incompatible references are not applied. The profile shown is the latest signed profile by timestamp with a deterministic ID tiebreaker. No AI service runs in this demo.
+**Work offline** retains edits locally; **Reconnect** exchanges pending contributions. Recovery & inspection provides public export/import and the read-only **Legacy notebooks** viewer. Signing keys live in browser storage, so retaining that storage preserves the identity; public exports preserve conversation records. New insertion batches accept up to 4,096 UTF-16 units. The editor saves typing in batches and reports local save and synchronization status.
+
+## Verify
 
 ```sh
 npm test
+npm run benchmark
 ```
 
-See [VENDOR.md](VENDOR.md) for copied source attribution and the boundary between Wiredove reuse and the demo's local profile format.
+The automated suite exercises signatures, merge convergence, passage anchors, causal authorization, relay durability, and storage isolation. The benchmark measures replay of actual signed contributions.
 
-## Planned collaboration architecture
+`npm run test:browser` runs the optional Playwright acceptance harness with Chrome and isolated browser storage contexts. Set `PLAYWRIGHT_MODULE` to an externally supplied Playwright `index.mjs` path and `CHROME_PATH` when needed. The harness uses a temporary relay store and writes screenshots into `verification/`.
 
-We will investigate and build an ANProto-specific CRDT for concurrent text editing, carried by signed ANProto events. This is the chosen direction; its merge rules and wire format still need to be proven and specified. ANProto's independently verifiable, portable authorship and integrity guarantees remain required: durable contributions must verify apart from the relay and CRDT implementation. A loopback relay will store and forward records so independent browsers can collaborate and catch up after disconnects. None of this collaboration architecture is implemented in the current demo. See the [custom CRDT work order](CUSTOM_MERGE_WORK_ORDER.md) and [decision record](ARCHITECTURE_COMPARISON.md). The earlier [Automerge work order](IMPLEMENTATION_WORK_ORDER.md) is retained for historical comparison and shared product requirements; Automerge is no longer the intended dependency.
-
-Keyhive is a possible later option for encrypted documents and changing access rights; it would complement rather than replace ANProto's signed authorship records, and the identity keys would need an explicit binding. The planned first prototype keeps fixed membership and public data. Its membership checks are not confidentiality.
-
-## Research
-
-Historical baseline: Google Wave's developer preview was unveiled at Google I/O on May 28, 2009. See the [verified chronology](GOOGLE_WAVE_RESEARCH.md#verified-chronology) for the separate public-access, development, and shutdown milestones.
-
-- [Offline Google Wave references](references/google-wave/README.md) — original specifications, three Google-published interface screenshots, and Google I/O video links with dates and provenance.
-- [How we think Google Wave worked](GOOGLE_WAVE_RESEARCH.md) — sourced design research covering the platform, collaboration model, automated participants, and implications for ANProto Wave; includes a comparison of the May and July 2009 federation drafts and the different authority model proposed for this prototype.
+[VERIFICATION.md](VERIFICATION.md) records the dated results and their test conditions. Earlier plans and research are in [the archive](docs/archive/README.md); original Wave sources are in the [reference collection](references/google-wave/README.md).

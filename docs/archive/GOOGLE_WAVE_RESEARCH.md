@@ -1,5 +1,7 @@
 # How we think Google Wave worked
 
+> Archived context. This document preserves earlier research or planning and does not govern current work. See [DIRECTION.md](../../DIRECTION.md) for the product and protocol direction, [ROADMAP.md](../../ROADMAP.md) for next work, and [DESIGN.md](../../DESIGN.md) for the implemented architecture. Paths and instructions in the historical text reflect their original context.
+
 Research notes for ANProto Wave · 22 September 2026
 
 ## Purpose and status
@@ -225,7 +227,7 @@ A public preview also needs an explicit boundary: showing a selected result is d
 
 ### The May and July 2009 federation drafts
 
-The May 2009 Wayback transcript and the July 2009 Apache-hosted document are distinct snapshots of the federation protocol, not two names for one unchanged specification. The older copy is preserved locally as a text transcript; the Wayback toolbar does not expose an exact timestamp for that selected capture. The July document is the later Apache-hosted draft, dated July 2009. The Apache Wave protocol page was last updated in 2013 and links to these specifications; the project is now retired. [May 2009 transcript](references/google-wave/specs/federation/draft-protocol-spec-wayback-transcript.txt) · [July 2009 Apache text](references/google-wave/specs/federation/wavespec.rst) · [Apache protocol-specifications page](https://cwiki.apache.org/confluence/spaces/WAVE/pages/31823357/Protocol%2BSpecifications)
+The May 2009 Wayback transcript and the July 2009 Apache-hosted document are distinct snapshots of the federation protocol, not two names for one unchanged specification. The older copy is preserved locally as a text transcript; the Wayback toolbar does not expose an exact timestamp for that selected capture. The July document is the later Apache-hosted draft, dated July 2009. The Apache Wave protocol page was last updated in 2013 and links to these specifications; the project is now retired. [May 2009 transcript](../../references/google-wave/specs/federation/draft-protocol-spec-wayback-transcript.txt) · [July 2009 Apache text](../../references/google-wave/specs/federation/wavespec.rst) · [Apache protocol-specifications page](https://cwiki.apache.org/confluence/spaces/WAVE/pages/31823357/Protocol%2BSpecifications)
 
 | Topic | May 2009 draft | July 2009 Apache draft |
 | --- | --- | --- |
@@ -344,7 +346,7 @@ Original sources are preferred. Apache-hosted documents below preserve Google's 
 | --- | --- |
 | [Google launch announcement, May 2009](https://googleblog.blogspot.com/2009/05/went-walkabout-brought-back-google-wave.html) | Product concept and separation of product, platform, protocol; announcement rather than exhaustive specification |
 | [Conversation model, October 2009](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/conversation/convspec.html) | Object vocabulary and relationships; explicitly a developing draft |
-| [May 2009 federation draft transcript](references/google-wave/specs/federation/draft-protocol-spec-wayback-transcript.txt) | Early XMPP `request`/`delta` protocol and wave-level authority; pasted Wayback text, exact capture timestamp unknown |
+| [May 2009 federation draft transcript](../../references/google-wave/specs/federation/draft-protocol-spec-wayback-transcript.txt) | Early XMPP `request`/`delta` protocol and wave-level authority; pasted Wayback text, exact capture timestamp unknown |
 | [July 2009 federation specification](https://svn.apache.org/repos/asf/incubator/wave/whitepapers/federation/wavespec.html) | Later Apache-hosted draft: wavelet hosting, XMPP/PubSub exchange, history, delivery, OT, and signer mechanisms; still marked work in progress |
 | [Client-server whitepaper, May 2010](https://svn-eu.apache.org/repos/asf/incubator/wave/tags/wave-0.4-rc2/whitepapers/client-server-protocol/client-server-protocol.html) | Useful scope warning; explicitly not Google's production web-client protocol |
 | [Google I/O API presentation, May 2009](https://docs.huihoo.com/google/io/2009/T_1200_Programming_With_For_Google_Wave.pdf) | Robot/gadget distinction, examples, API concepts; developer-preview material |

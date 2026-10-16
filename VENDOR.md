@@ -1,13 +1,14 @@
-# Copied dependencies
+# Dependencies and asset provenance
 
-This demo only changes files within anproto-wave.
+ANProto Wave uses repository-local copies of its signing and avatar dependencies. The browser interface uses native HTML and structural CSS.
 
-- `vendor/wiredove.css`: copied unchanged from `../wiredove/style.css`.
-- `vendor/wiredove-render.js`: copied unchanged from `../wiredove/client/render.js`. Its active Visualize Buffer avatar implementation credits Dominic Tarr (MIT).
-- `vendor/doveorange_sm.png`: copied from Wiredove.
-- `vendor/an.js`: copied from `../anproto/an.js`, removing only the unused blob-module import/export to keep the demo self-contained.
+- `vendor/an.js`: copied from `../anproto/an.js`, with the unused blob-module import/export removed to keep the app self-contained.
 - `vendor/lib/nacl-fast-es.js`: copied from ANProto, with its public-domain notice retained.
 - `vendor/lib/base64.js`: copied from ANProto, with its Deno MIT notice retained.
-- The avatar upload flow in `app.js` adapts Wiredove's `profile_header.js` center crop: 256×256 canvas → PNG data URL → content hash. The older proportional-resize settings uploader is not used.
+- `vendor/wiredove-render.js`: copied unchanged from `../wiredove/client/render.js`. Its active Visualize Buffer avatar implementation credits Dominic Tarr (MIT).
+- `vendor/wiredove.css` and `vendor/doveorange_sm.png`: retained copies of Wiredove's stylesheet and dove asset from the earlier interface. The current HTML pages use `wave.css` for structural layout.
+- The avatar upload flow in `app.js` adapts Wiredove's `profile_header.js` center crop: 256×256 canvas → PNG data URL → content hash.
 
-Profile records use signed JSON for this Wave demo, not Wiredove's YAML post format. This is visual and image-format reuse, not a claim of live Wiredove profile synchronization. No external dependencies, fonts, relays, or profile services are requested.
+V1 and v2 profile records use signed JSON. The v2 app exchanges those self-asserted profiles and content-addressed image bytes through its local relay. Production dependencies are included in the repository. The optional browser verification harness uses externally supplied Playwright and Chrome.
+
+The Google Wave reference collection retains source notices and provenance for historical specifications, screenshots, and research. See [references/google-wave/README.md](references/google-wave/README.md).

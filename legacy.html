@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legacy ANProto Wave</title><link rel="stylesheet" href="./wave.css"></head>
+<body><main id="scroller">
+<header class="message"><h1>Legacy ANProto Wave</h1><p>Read and export earlier signed notebooks.</p>
+<p class="message-meta">Local notebook viewer · Export a notebook to share it.</p></header>
+<section class="message"><div class="toolbar"><label>Writing as <select id="identity" aria-label="Writing as"></select></label><button id="add-person">New identity</button><button id="profile-button">Edit profile</button><button id="example">Load two-person example</button></div><div id="profile"></div></section>
+<section class="message"><div class="toolbar"><label>Notebook <select id="notebooks" aria-label="Notebook"></select></label><button id="create">New Wave</button><button id="export">Export</button><button id="import">Import</button><input id="import-file" type="file" accept="application/json" hidden></div><div id="new-wave"></div></section>
+<section id="transfer" class="message" hidden><label for="bundle">Notebook exchange · copy an export or paste one to import</label><textarea id="bundle" aria-label="Notebook JSON"></textarea><div class="toolbar"><button id="import-text">Import pasted notebook</button><button id="choose-file">Choose export file</button><button id="close-transfer">Close</button></div></section>
+<p id="notice" role="status" aria-live="polite"></p><section id="wave"></section>
+<footer class="message-meta">ANProto signatures · Keys stay in this browser. Exports contain public records and avatar images.</footer>
+</main><script type="module" src="./legacy-app.js"></script></body></html>

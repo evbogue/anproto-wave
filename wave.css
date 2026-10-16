@@ -1,18 +1,25 @@
-/* Only notebook-specific layout; the visual system is copied from Wiredove. */
-body { margin-top: 16px; }
-.message-meta { position:static; display:block; color:var(--wiredove-muted); font-size:.9em; }
-.message-main > img, .person > img { flex-shrink:0; }
-.toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:8px 0; }
-select { max-width:220px; padding:5px; }
-textarea { box-sizing:border-box; width:100%; min-height:90px; }
-.wave-text { white-space:pre-wrap; overflow-wrap:anywhere; }
-.reply-group { margin-left:20px; border-left:2px solid var(--wiredove-control-border); padding-left:8px; }
-.participants { display:flex; flex-wrap:wrap; gap:12px; margin:12px 0; }
-.person { display:inline-flex; align-items:center; gap:6px; }
-.conflict { border-left:3px solid #e69a35; padding-left:10px; }
-.profile-photo { width:80px; height:80px; border-radius:50%; object-fit:cover; }
-button, summary { cursor:pointer; }
+/* Structural layout. Text and controls use the browser's default appearance. */
 [hidden] { display:none !important; }
-#notice { padding:8px; overflow-wrap:anywhere; }
-input[type=text] { box-sizing:border-box; width:100%; }
-footer { margin-top:20px; }
+#scroller { max-width:1200px; margin:auto; padding:0 8px; }
+.workspace { display:grid; grid-template-columns:230px minmax(0,1fr); gap:24px; align-items:start; }
+.workspace > *, .message-stack { min-width:0; }
+.toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:8px 0; }
+#notebooks { display:flex; flex-direction:column; align-items:start; gap:8px; margin:16px 0; }
+button, select, input { max-width:100%; }
+textarea { box-sizing:border-box; width:100%; min-height:90px; }
+.blip textarea { min-height:150px; }
+.wave-text, blockquote { white-space:pre-wrap; overflow-wrap:anywhere; }
+#notice, p, summary, button, footer { overflow-wrap:anywhere; }
+.participants { display:flex; flex-wrap:wrap; gap:12px; margin:12px 0; }
+.person, .message-main { display:flex; align-items:center; gap:8px; }
+.avatar { width:32px; height:32px; flex-shrink:0; }
+.profile-photo { width:80px; height:80px; object-fit:cover; }
+.blip { margin:20px 0; }
+.reply-group { margin:8px 0 8px 16px; }
+blockquote { margin:8px 16px; }
+.message-meta { display:block; }
+footer { margin:24px 0; }
+@media(max-width:650px) {
+  .workspace { grid-template-columns:minmax(0,1fr); }
+  .reply-group { margin-left:8px; }
+}

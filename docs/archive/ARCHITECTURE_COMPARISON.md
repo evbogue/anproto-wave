@@ -1,5 +1,7 @@
 # ANProto Wave architecture comparison
 
+> Archived context. This document preserves earlier research or planning and does not govern current work. See [DIRECTION.md](../../DIRECTION.md) for the product and protocol direction, [ROADMAP.md](../../ROADMAP.md) for next work, and [DESIGN.md](../../DESIGN.md) for the implemented architecture. Paths and instructions in the historical text reflect their original context.
+
 Date: 30 September 2026
 
 Decision (2 October 2026): investigate and build an ANProto-specific CRDT for the Wave collaboration needs. Automerge is no longer the intended dependency. The CRDT algorithm and protocol details remain subject to investigation and proof; this decision does not claim the implementation exists.
@@ -9,7 +11,7 @@ The comparison below records the earlier evaluation of two implementation work o
 - [Work order A: Automerge-backed prototype](IMPLEMENTATION_WORK_ORDER.md)
 - [Current work order: ANProto-specific CRDT](CUSTOM_MERGE_WORK_ORDER.md)
 
-These scores record the earlier tradeoff analysis; they do not override the decision above. Neither architecture is implemented. **A score of 5 is strongest**; for cost and risk criteria, 5 means lower cost/risk.
+These scores record the earlier tradeoff analysis; they do not override the decision above. Update (12 October 2026): the narrow custom CRDT prototype is implemented; see [VERIFICATION.md](../../VERIFICATION.md). Automerge remains unimplemented. **A score of 5 is strongest**; for cost and risk criteria, 5 means lower cost/risk.
 
 ## Weighted decision matrix
 

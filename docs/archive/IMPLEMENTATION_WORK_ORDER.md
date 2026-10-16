@@ -1,5 +1,7 @@
 # Work order A: Automerge-backed ANProto Wave prototype
 
+> Archived context. This document preserves earlier research or planning and does not govern current work. See [DIRECTION.md](../../DIRECTION.md) for the product and protocol direction, [ROADMAP.md](../../ROADMAP.md) for next work, and [DESIGN.md](../../DESIGN.md) for the implemented architecture. Paths and instructions in the historical text reflect their original context.
+
 Date: 22 September 2026
 
 Status: superseded architecture option, retained for comparison and for the shared product requirements and acceptance scenario. The decision is to investigate and build an ANProto-specific CRDT; use the [custom CRDT work order](CUSTOM_MERGE_WORK_ORDER.md) for the current implementation direction. The Automerge instructions in this document are not an implementation mandate. This document authorizes no changes outside this project.
@@ -57,7 +59,7 @@ Inspect Wiredove's active `client/render.js`, `profile_header.js`, and `style.cs
 
 Before designing the interface, inspect original Google Wave demonstration material and interface screenshots, starting with sources in the research document. Record which source or video timestamp supports each adopted interaction. Distinguish demonstrated behavior, draft protocol behavior, and our new design. Do not claim pixel fidelity or exact production behavior from a protocol draft.
 
-Produce a short `DESIGN.md`: a written screen layout, the interaction sequence below, and the architecture decisions. No elaborate design system, generated artwork, or mockup-only deliverable is needed. Compare the current app to the reference interaction, not just its colors.
+Produce a short [DESIGN.md](../../DESIGN.md): a written screen layout, the interaction sequence below, and the architecture decisions. No elaborate design system, generated artwork, or mockup-only deliverable is needed. Compare the current app to the reference interaction, not just its colors.
 
 ## 4. The acceptance scenario
 
@@ -105,7 +107,7 @@ The historical federation protocol is context, not a blueprint for this implemen
 
 Use an established text CRDT implementation with supported stable/relative positions and a browser editor binding. Do not hand-roll OT or a character CRDT for this work order. Plain text is sufficient; a dependable editor binding is more important than retaining zero dependencies.
 
-Before choosing a package, consult its current official documentation and license. Pin exact dependency versions and commit the lockfile. In `DESIGN.md`, name the engine, binding, anchor behavior, Unicode indexing convention, and persistence format. Demonstrate same-blip convergence and anchor movement in a small test before building the full UI. If no suitable engine satisfies these requirements, report the concrete blocker rather than falling back to full-text last-writer-wins updates.
+Before choosing a package, consult its current official documentation and license. Pin exact dependency versions and commit the lockfile. In [DESIGN.md](../../DESIGN.md), name the engine, binding, anchor behavior, Unicode indexing convention, and persistence format. Demonstrate same-blip convergence and anchor movement in a small test before building the full UI. If no suitable engine satisfies these requirements, report the concrete blocker rather than falling back to full-text last-writer-wins updates.
 
 Prefer one text document per blip. Keep conversation structure as explicitly validated signed records instead of giving opaque editor updates authority to change membership or parent relationships. Do not implement distributed text editing with the existing whole-note `replaces` chain. Preserve that model only for legacy data.
 
@@ -117,7 +119,7 @@ Continue using the existing ANProto signing primitives. A v2 contribution signs 
 
 Treat portable authorship as a product guarantee: an exported durable contribution must be independently verifiable without the original relay, Automerge Repo instance, or Keyhive service. Bind each contribution to its wave/blip, payload format, exact Automerge update bytes (or other semantic payload), and causal context. Use bounded update batches rather than signing each keystroke. If Keyhive is added later, explicitly bind each Keyhive identity to the ANProto signing key; never infer that the two keys represent the same author. Keyhive can grant or revoke access, but it cannot replace the required ANProto verification record.
 
-Define a versioned protocol in `PROTOCOL.md`, with exact field types, limits, record IDs, dependency rules, invalid-record handling, and executable examples. At minimum define:
+Define a versioned protocol in [PROTOCOL.md](../../PROTOCOL.md), with exact field types, limits, record IDs, dependency rules, invalid-record handling, and executable examples. At minimum define:
 
 | Record | Meaning |
 | --- | --- |
@@ -168,7 +170,7 @@ Keep export/import as recovery/diagnostic features, not the collaboration path. 
 ## 7. Implementation sequence and gates
 
 1. **Baseline:** record git status; preserve user edits; run existing tests. Inventory reusable and replaceable parts. No sibling changes.
-2. **Design proof:** complete the short source/interaction review and text-engine/anchor spike. Write `DESIGN.md` and `PROTOCOL.md`. Resolve ordinary technical decisions within scope; ask the user only for a material scope change or a blocker that defeats required behavior.
+2. **Design proof:** complete the short source/interaction review and text-engine/anchor spike. Write [DESIGN.md](../../DESIGN.md) and [PROTOCOL.md](../../PROTOCOL.md). Resolve ordinary technical decisions within scope; ask the user only for a material scope change or a blocker that defeats required behavior.
 3. **Vertical slice:** two independent clients edit one blip through signed updates and the relay. Prove convergence, outbox durability, and reconnect before adding the full conversation UI.
 4. **Conversation slice:** implement structure, passage selection, anchored threads, nesting, and deleted-anchor presentation. Prove remote edits do not destroy the active editor.
 5. **Product slice:** wave list, participants/presence, Wiredove styling, complete profile/image exchange, accessible controls, history inspector, legacy access, and error states.
@@ -196,7 +198,7 @@ Done means all required behaviors pass, the app starts from the documented comma
 ## 9. Deliverables and final handoff
 
 - Working code and tests contained in this repository.
-- `DESIGN.md` and `PROTOCOL.md` with implemented decisions, not hypothetical alternatives.
+- [DESIGN.md](../../DESIGN.md) and [PROTOCOL.md](../../PROTOCOL.md) with implemented decisions, not hypothetical alternatives.
 - Updated `README.md`: start/test commands, two-client setup, fixed membership, public-data warning, persistence/key limitations, and legacy access.
 - Updated `VENDOR.md` and dependency/license provenance.
 - Actual screenshots and a concise verification report, including remaining limitations.

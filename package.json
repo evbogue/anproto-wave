@@ -1,1 +1,10 @@
-{"private":true,"type":"module","scripts":{"start":"node server.js","test":"node --test wave.test.js"}}
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test wave.test.js crdt.test.js relay.test.js",
+    "test:browser": "node browser.test.mjs",
+    "benchmark": "node benchmark.mjs"
+  }
+}

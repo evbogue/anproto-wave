@@ -1,24 +1,30 @@
 # ANProto Wave
 
-We are building ANProto Wave, a browser workspace where partners write messages together, publish them to wider audiences with authorship and contribution credits, and keep improving them as living documents. Encrypted working drafts give authors room to collaborate. Each publication moves an approved revision across the privacy boundary to a chosen audience. Readers can discuss both published messages and work that authors have announced is underway.
+ANProto Wave is a browser workspace for shared writing, passage replies, and portable signed history. The current v2 prototype supports live collaboration, offline edits, reconnect, public export/import, and personal Archive/Restore. **All current conversation records are public and unencrypted, and editors are fixed when a Wave is created.**
 
-We are building this experience with simple HTML elements and structural CSS. The first demonstration follows two authors and an audience member across three browser tabs: write together, discuss a closed message, publish, continue editing privately, and publish an update.
+The product direction is to publish exact attributed revisions while collaborators keep developing a working draft. Encrypted drafts, announcements, publication records, and audience discussion are planned; they are not available in the current demo.
 
-The project also develops the protocols behind that experience: local ownership, offline collaboration, signed contributions, deterministic text merging, encrypted access, and distribution across independently operated infrastructure.
+The immediate priority is to preserve a resumable collaboration checkpoint while the Wiredove/evbogue.com reading-and-reply experiment proceeds. Start with the [work order](WORK_ORDER.md), [current checkpoint](CHECKPOINT.md), and [roadmap](ROADMAP.md).
 
-## How a Wave works
+## Current demo
 
-1. **Write together.** Authors and invited partners edit a shared working draft and reply to passages. Contributions retain their signing identity.
-2. **Announce the work.** Authors can publish a closed-message entry containing a chosen title, collaborator names, and status. The audience can discuss that entry while the draft develops.
-3. **Publish.** Authorized authors release a particular revision, its byline, and selected contribution credits to a chosen audience.
-4. **Keep writing.** Authors continue editing the working draft while readers see the latest publication available to them.
-5. **Publish an update.** A later publication advances the audience's view. Earlier publications and the discussions attached to them remain addressable.
+1. Create a Wave with a fixed set of editor public keys.
+2. Write together, reply to messages or selected passages, and inspect signed history.
+3. Work offline and reconnect to exchange retained edits.
+4. Collapse the Wave into your personal Archive, then explicitly restore it. Other participants keep their own views.
+
+## Planned publishing workflow
+
+Collaborate → optionally announce → publish an exact attributed revision → discuss → keep writing → publish an update. Earlier publications and their discussion context remain addressable. The intended policy lets a person release content they can access without another author's approval.
+
+[Wave workflow](WORKFLOW.md) specifies this intended lifecycle and distinguishes implemented behavior from planned stages.
 
 A **revision** identifies a state of a message. An **epoch** identifies a membership and encryption-key state. A **publication** releases a revision and selected attribution to an audience. Publication history and cryptographic epochs advance independently.
 
 ## Project guide
 
 - [Direction](DIRECTION.md): product intentions and protocol principles.
+- [Wave workflow](WORKFLOW.md): the complete path from creation to collapse, including restore and viewer ownership.
 - [Publishing and privacy](PUBLISHING.md): the planned author, audience, encryption, and publication model.
 - [Roadmap](ROADMAP.md): implementation sequence and acceptance evidence.
 - [Design](DESIGN.md): the existing collaboration engine and browser interactions.
@@ -30,7 +36,7 @@ A **revision** identifies a state of a message. An **epoch** identifies a member
 
 The development checkout contains the v2 collaboration foundation: shared text editing, passage replies, signed history, browser persistence, offline work, reconnect, public export/import, and a durable loopback relay. Its records are public and unencrypted, and each Wave has a fixed set of editors. The interface uses native HTML elements and structural CSS. [DESIGN.md](DESIGN.md) records that baseline.
 
-The next implementation milestone adds encrypted drafts, publication records, audience discussion, and distinct author and reader views. [PUBLISHING.md](PUBLISHING.md) describes the intended behavior; [ROADMAP.md](ROADMAP.md) turns it into implementation and verification steps.
+After the interactive timeline milestone, Wave resumes with a specified encryption/access model, followed by small implementation slices for encrypted drafts, publication records, and audience views. [PUBLISHING.md](PUBLISHING.md) describes the intended behavior; [ROADMAP.md](ROADMAP.md) turns it into implementation and verification steps.
 
 ## Run the collaboration foundation
 
@@ -45,6 +51,8 @@ Use independent browser profiles for independent signing identities. In each pro
 Add a message, choose **Edit**, and type. Changes are signed, saved locally, and exchanged while typing. **Done** closes the editor. Select a passage and choose **Reply here** to create an inline thread. History shows signed contributions. Concurrent edits converge; authors review the resulting prose together.
 
 **Work offline** retains edits locally; **Reconnect** exchanges pending contributions. Recovery & inspection provides public export/import and the read-only **Legacy notebooks** viewer. Signing keys live in browser storage, so retaining that storage preserves the identity; public exports preserve conversation records. New insertion batches accept up to 4,096 UTF-16 units. The editor saves typing in batches and reports local save and synchronization status.
+
+**Collapse Wave** saves current edits and moves the Wave into **Archive** for this identity in this browser. Add or close unfinished message/reply composers first. **Restore** returns it to the viewer. New activity and reloads leave archived Waves archived. Archive preferences remain local and are excluded from public exports.
 
 ## Verify
 

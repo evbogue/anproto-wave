@@ -2,13 +2,17 @@
 
 ANProto Wave lets partners write messages together, publish credited revisions to wider audiences, and continue developing those messages as living documents. We are building a browser prototype that makes the movement from private collaboration to public conversation visible and understandable.
 
-## The experience
+Current status: public, unencrypted v2 collaboration with fixed editors and personal Archive/Restore. The encrypted publishing experience below is planned. See [CHECKPOINT.md](CHECKPOINT.md) for current evidence and [WORK_ORDER.md](WORK_ORDER.md) for immediate scope.
+
+## The intended experience
 
 A Wave connects shared writing with the conversations around it. Authors collaborate in an encrypted working draft, exchange passage replies, and inspect who changed what. They decide when a revision is ready and who should receive it. Publishing releases that revision with author names and selected contribution credits.
 
 The working draft continues after publication. Each audience sees the latest revision published to it while authors prepare the next one. The privacy boundary moves through explicit publishing decisions. An author may share a revision with a small review group, later publish it more widely, and continue working with the original writing partners.
 
 Authors can announce work before publishing its contents. A closed-message entry exposes chosen metadata, such as a title, collaborator names, and status. The audience can gossip, speculate, ask questions, and discuss the announced work. That discussion belongs to the Wave throughout the message's life. Replies to published passages retain the publication and quote they originally addressed.
+
+The final viewer action is **Collapse Wave**: file the whole Wave into a personal Archive and remove it from the active viewer. Content, publications, and discussion remain intact. Other participants keep their own views, and new activity leaves the Wave archived until **Restore**. [WORKFLOW.md](WORKFLOW.md) defines the full path and its implementation status.
 
 ## Language
 
@@ -18,8 +22,11 @@ Authors can announce work before publishing its contents. A closed-message entry
 - **Epoch:** a particular membership and encryption-key state for an encrypted group.
 - **Publication:** an authorized release of a revision and selected attribution to a specified audience.
 - **Closed message:** an announced message whose public entry describes work underway while its draft remains accessible to its collaborators.
+- **Collapsed Wave:** a Wave filed into the current viewer's Archive, with its content and history retained for restoration.
 
 The interface uses **Publish** and **Publish update**. Epoch changes follow cryptographic group changes; publications follow editorial decisions. Both have their own history.
+
+For the initial workflow, anyone with access to a Wave can change its viewership, including audience members. A person can publish content they can already access without approval from another author. Each action records the chosen audience and acting identity.
 
 ## Authorship and credit
 
@@ -40,7 +47,7 @@ The first complete scenario uses three tabs with distinct demo identities. Alice
 - **Deterministic merging:** signed causal history and stable text identities produce a reproducible conversation from the accepted event set.
 - **Portable authorship:** signatures bind contributions and publications to identities across clients and transports. Display names remain self-asserted profile information.
 - **Explicit access:** encrypted content, recipient membership, editing rights, and publishing authority each have defined rules. Audience access is granted to the selected content and history.
-- **Deliberate publication:** each release records exactly what was approved, by whom, and for which audience. Already delivered content remains in its recipients' possession.
+- **Deliberate publication:** each release records the exact revision selected, the acting publisher, and the chosen audience. Already delivered content remains in its recipients' possession.
 - **Distributed infrastructure:** clients exchange verifiable records through independently operated peers or relays, preserving the meaning of the conversation across transport changes.
 
 ## From foundation to product

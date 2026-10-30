@@ -10,6 +10,12 @@ Native HTML elements and structural CSS provide the interface. Browser defaults 
 
 The inspected Google-published `references/google-wave/screenshots/inbox-2009.png` supports the participant strip, conversation workspace, and replies interspersed with message content. `references/google-wave/specs/conversation/convspec.rst`, vocabulary and conversation-manifest examples, distinguishes blips, threads, continuations, and inline replies. The selected-text gesture, scalar-ID anchors, RGA, polling relay, and simple textarea binding are our implementation choices. The historical sources inform conversation structure; the prototype uses the browser’s native presentation.
 
+## Personal archive
+
+**Collapse Wave** saves active shared-text edits, records personal archive membership, and removes the Wave from the active list and conversation viewer. Unsubmitted message/reply composers must be added or closed first. Archive entries offer **Restore**; a share link to an archived Wave shows a restore prompt. Reload, import, and remote edits preserve archive membership. Other identities retain independent views.
+
+Archive membership is stored in localStorage under `anproto-wave-v2-archive:<public-key>`, separate from identity keys and signed records. It is scoped to this identity and browser origin, excluded from exports and relay traffic, and cleared with browser storage. The signed history, IndexedDB drafts, and outbox remain intact. Collapse works offline and does not change protocol authorization or compact history. See [WORKFLOW.md](WORKFLOW.md) for the full lifecycle.
+
 ## Narrow CRDT
 
 The source of truth is a set of immutable ANProto-signed records. Creation-record IDs identify Waves, threads, and blips. Text is an RGA-style sequence: each Unicode scalar has an immutable ID, a predecessor, and a deterministic ordering key. A run chains its characters together. Tombstones hide precisely the IDs observed by a deletion; unseen concurrent insertions survive.

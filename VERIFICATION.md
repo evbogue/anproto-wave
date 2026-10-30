@@ -1,5 +1,23 @@
 # Verification
 
+## Current checkpoint — 30 October 2026
+
+The current working tree passed `npm test` (13 passed, 0 failed) and the Chrome/Playwright browser acceptance harness with two independent identities and a temporary loopback relay store. Remote edit display measured **796 ms**. Relay and browser checks required execution outside the restricted sandbox because loopback binding there failed with `EPERM`.
+
+Archive checks covered save-before-collapse, unfinished composers, storage failure, reload, incoming activity, share-link handling, import, identity isolation, and both restore controls. The harness refreshed the Alice, Bob, narrow, and Archive screenshots; the narrow and Archive layouts were visually inspected. No encryption or publication guarantees are implemented.
+
+[CHECKPOINT.md](CHECKPOINT.md) records the base revision and preserved checkpoint changes, reproduction command, limitations, and handoff. The sections below preserve historical results; benchmarks and the separate legacy-browser smoke check were not rerun on 30 October.
+
+## Wave collapse and Archive — 16 October 2026
+
+The public v2 viewer now supports **Collapse Wave**, a personal Archive, and explicit restoration. [WORKFLOW.md](WORKFLOW.md) defines the full lifecycle and identifies which publishing stages remain planned.
+
+`npm test`: **13 passed, 0 failed**. `npm run test:browser`: **passed** using Chrome and Playwright. The acceptance harness checks collapse while editing offline, local save before removal, retention after reload, incoming remote activity, share-link handling, import without restoration, isolation between local identities and independent browsers, restoration through both controls, and preservation of passage replies. An unfinished composer blocks collapse without losing its text. A simulated archive-storage failure leaves the Wave visible.
+
+The archive check uses isolated browser contexts and a temporary relay store. Archive membership remains local to the identity and browser; it is excluded from public record exports. Encryption and publishing are not implemented by this change.
+
+The [Archive screenshot](verification/archive.png) shows the collapsed Wave retained in an expanded Archive at a 390px viewport. Conversation screenshots below were refreshed for this change. The narrow conversation and Archive layouts were visually inspected.
+
 ## Collaboration foundation — 15 October 2026
 
 The signed v2 collaboration foundation passed automated and browser acceptance checks after alignment with the project's plain-HTML direction. The browser pages use native controls and structural CSS. The review covered the editor, reducer, persistence, relay, legacy viewer, fixtures, and documentation. The legacy viewer's instructions now describe its read-and-export behavior.
@@ -45,7 +63,7 @@ The composition check uses browser-dispatched composition events. Further accept
 
 The 15 October run measured **792 ms** from a textarea change to its display in the other context, meeting the below-one-second loopback target. The 12 October run recorded 806 ms, with earlier runs ranging from 185 to 832 ms. These measurements describe the local Chrome and loopback setup.
 
-Acceptance screenshots from the 15 October run; Alice and the narrow layout were visually inspected after capture:
+Acceptance screenshots, refreshed on 16 October with the Collapse Wave and Archive controls:
 
 - [Alice](verification/two-client-alice.png)
 - [Bob](verification/two-client-bob.png)
@@ -78,6 +96,6 @@ These characteristics define the conditions under which the recorded checks appl
 
 ## Publishing acceptance targets
 
-The next milestone will demonstrate two authors and an audience member through the full message lifecycle: encrypted collaboration, an optional closed-message announcement, audience discussion, publication with byline and contribution credits, continued private editing, and a published update.
+The future publishing integration milestone will demonstrate two authors and an audience member through the full message lifecycle: encrypted collaboration, an optional closed-message announcement, audience discussion, publication with byline and contribution credits, continued private editing, and a published update.
 
-Verification will inspect access at the record and key level as well as the UI. It will cover exact revision approvals during concurrent typing, recipient-specific releases, public attribution verification, publication-specific passage replies, epoch changes, and offline recovery. Results will be recorded here with their implementation version, test conditions, and measured outcomes.
+Verification will inspect access at the record and key level as well as the UI. It will cover exact publisher-selected revisions during concurrent typing, recipient-specific releases, public attribution verification, publication-specific passage replies, epoch changes, and offline recovery. Results will be recorded here with their implementation version, test conditions, and measured outcomes.

@@ -2,13 +2,19 @@
 
 ANProto Wave will let authors collaborate on encrypted messages and publish selected revisions to progressively wider audiences. Every message can keep evolving after publication. This document describes the intended model for the next implementation milestone, building on the v2 collaboration engine documented in [DESIGN.md](DESIGN.md) and [PROTOCOL.md](PROTOCOL.md).
 
+**Implementation status:** this is a design for future work. Current v2 records are public and unencrypted, with fixed editors; no publication or audience-access controls are implemented. [CHECKPOINT.md](CHECKPOINT.md) records the existing baseline.
+
 ## Message lifecycle
 
 A message has a stable identity connecting its working draft, publications, and discussion. Authors edit the working draft together. A publication captures a precise revision, chosen byline, contribution credits, intended audience, and authorizing signatures. Later edits continue in the draft. **Publish update** releases another revision while preserving the earlier publication as a referenceable object.
 
 Each audience sees the latest publication addressed to it. A review group may receive a newer revision than the public audience. Authors can publish the same revision to another audience through a further signed publication record.
 
-Publishing authority is part of the message's policy. The implementation must make the authorized publishers and required approvals explicit. An approval binds the exact revision, attribution, and audience. Concurrent or later typing belongs to subsequent draft work. The first implementation will choose and document a concrete approval policy before enabling publication.
+The complete viewer workflow ends with **Collapse Wave**, which files the whole Wave into that viewer's Archive. Collapse is available before or after publication and preserves all messages, releases, and discussion. It changes no other participant's view or access. New activity leaves it archived until an explicit **Restore**. This personal viewer state is independent of message publication and encryption epochs; [WORKFLOW.md](WORKFLOW.md) defines its behavior.
+
+The initial policy is deliberately permissive: **anyone who can access a Wave can change its viewership**, including collaborators and audience members. No designated publisher, unanimous approval, or additional author approval is required. The acting person's signed action authorizes the change. A release binds the exact revision, attribution, and audience; concurrent or later typing belongs to subsequent draft work.
+
+Viewership changes apply to the Wave's announced or released content and may broaden or narrow its audience. A person can release content they can already access; audience membership alone does not reveal unpublished working text. Narrowing viewership changes future delivery and does not erase copies already received. Each change records who made it and which audience they selected. This shared audience setting is independent of each person's collapse/restore state.
 
 ## Author and audience views
 
@@ -61,7 +67,7 @@ The planned publication record binds:
 - The released text and any explicitly released supporting history.
 - The byline, contribution credits, and evidence accompanying those credits.
 - The intended audience and restricted-access material where required.
-- The publishing identities and approvals required by the message policy.
+- The acting publisher's identity and signature; the initial policy requires no other person's approval.
 
 The byline expresses editorial authorship. Signed edits record which identity performed each operation. The UI groups operations into readable contributions, including insertions, removals, and revisions. The author view retains detailed working history; each publication carries its selected attribution.
 
@@ -83,4 +89,4 @@ The prototype will use plain HTML and structural CSS with three tabs representin
 
 Alice and Bob edit together and inspect signed changes. The audience sees a chosen closed-message entry and posts discussion. Publishing makes the approved revision, byline, and credits available to the audience. Subsequent author edits remain within the working group until **Publish update**. Reload and offline/reconnect preserve the intended view for each identity.
 
-Verification will inspect network responses, exported records, browser storage, and decryption behavior in addition to the rendered UI. Independent browser storage contexts will establish the access boundary. Acceptance will include publication during concurrent typing, revision-specific replies, audience expansion, membership changes, and attribution verification.
+Verification will inspect network responses, exported records, browser storage, and decryption behavior in addition to the rendered UI. Independent browser storage contexts will establish the access boundary. Acceptance will include publication during concurrent typing, revision-specific replies, viewership changes by either collaborator and by an audience member without additional approvals, audience expansion and narrowing, membership changes, and attribution verification.

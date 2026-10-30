@@ -26,3 +26,6 @@ export const saveDraft=draft=>transaction(['drafts'],'readwrite',tx=>tx.objectSt
 export const removeDraft=id=>transaction(['drafts'],'readwrite',tx=>tx.objectStore('drafts').delete(id));
 export function keys(){return JSON.parse(localStorage.getItem('anproto-wave-v2-keys')||'[]');}
 export function addKey(key){const all=keys();all.push(key);localStorage.setItem('anproto-wave-v2-keys',JSON.stringify(all));}
+// Personal viewer state never enters signed records, exports, or relay traffic.
+export function collapsedWaves(identity){return new Set(JSON.parse(localStorage.getItem('anproto-wave-v2-archive:'+identity)||'[]'));}
+export function setCollapsed(identity,wave,collapsed){const ids=collapsedWaves(identity);if(collapsed)ids.add(wave);else ids.delete(wave);localStorage.setItem('anproto-wave-v2-archive:'+identity,JSON.stringify([...ids]));}

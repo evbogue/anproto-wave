@@ -92,15 +92,34 @@ function renderBlip(b,depth=0){
   for(const r of b.history)c.history.append(el('p',{className:'message-meta',textContent:`${profile(r.author).name} · ${r.data.type==='blip'?'created':r.data.ops.map(o=>o.kind==='insert'?`inserted ${Array.from(o.text).length} character(s)`:`deleted ${o.ids.length} character(s)`).join(', ')} · signature verified · ${new Date(r.time).toLocaleString()}`}));
   return c.node;
 }
+async function collapseWave(){
+  await serial(async()=>{
+    if(session?.composing)throw Error('Finish composing your text before collapsing this Wave.');
+    if([...$('wave').querySelectorAll('textarea')].some(field=>field!==session?.field&&field.value.trim()))throw Error('Add or close your unfinished message or reply before collapsing this Wave.');
+    await flush();
+    store.setCollapsed(active,selected,true);
+    session=null;selected='';history.replaceState(null,'',location.pathname+location.search);clearView();render();
+    say('Wave collapsed into Archive. Restore it when you want to return.');
+  });
+  void sync();
+}
+async function restoreWave(id){
+  await finish();store.setCollapsed(active,id,false);selected=id;location.hash=encodeURIComponent(id);clearView();render();say('Wave restored to your viewer.');
+}
 function render(){
   rebuild();const scroll=window.scrollY,focus=document.activeElement,selection=focus?.tagName==='TEXTAREA'?[focus.selectionStart,focus.selectionEnd,focus.selectionDirection]:null;
   const roots=records.filter(r=>r.data.type==='wave').sort((a,b)=>a.id<b.id?-1:1);
-  if(!selected&&roots.length){selected=roots[0].id;rebuild();}
+  const collapsed=store.collapsedWaves(active),visible=roots.filter(r=>!collapsed.has(r.id)),archived=roots.filter(r=>collapsed.has(r.id));
+  if(!selected&&visible.length){selected=visible[0].id;rebuild();}
   $('identity').replaceChildren(...identities.map(k=>el('option',{value:k.slice(0,44),textContent:profile(k.slice(0,44)).name})));$('identity').value=active;
-  $('notebooks').replaceChildren(...roots.map(r=>button(r.data.title,async()=>{await finish();selected=r.id;location.hash=encodeURIComponent(selected);clearView();render();})));$('export').disabled=!model;
+  $('notebooks').replaceChildren(...visible.map(r=>button(r.data.title,async()=>{await finish();selected=r.id;location.hash=encodeURIComponent(selected);clearView();render();})));
+  $('archive-summary').textContent=`Archive (${archived.length})`;
+  $('archived-waves').replaceChildren(...archived.map(r=>el('li',{},[el('span',{textContent:r.data.title}),button('Restore',()=>restoreWave(r.id))])));
+  $('export').disabled=!model||collapsed.has(selected);
   const area=$('wave');
+  if(collapsed.has(selected)){clearView();area.replaceChildren(el('section',{className:'message'},[el('h2',{textContent:'This Wave is archived'}),el('p',{textContent:'Restore it to return it to your viewer.'}),button('Restore Wave',()=>restoreWave(selected))]));return;}
   if(!model){area.replaceChildren(el('section',{className:'message'},[el('h2',{textContent:selected?'Waiting for this Wave…':'Start a conversation'}),el('p',{textContent:'Create a Wave with another person’s public key, then send them its share link. Open the link in a browser using the same local relay.'})]));return;}
-  const content=[el('header',{className:'message'},[el('h2',{textContent:model.root.data.title}),el('p',{id:'activity',className:'message-meta',textContent:presence.filter(p=>p.wave===selected&&p.author!==active).map(p=>profile(p.author).name+' is editing…').join(' · ')}),el('div',{className:'participants'},model.members.map(person)),el('p',{className:'message-meta',textContent:model.members.includes(active)?'All participants can edit. Select a passage to reply in context.':'Read-only: this identity is not a participant.'}),button('Copy share link',async()=>{const url=location.origin+'/#'+encodeURIComponent(selected);await navigator.clipboard.writeText(url);say('Share link copied. This relay is local to this computer.');})])];
+  const content=[el('header',{className:'message'},[el('h2',{textContent:model.root.data.title}),el('p',{id:'activity',className:'message-meta',textContent:presence.filter(p=>p.wave===selected&&p.author!==active).map(p=>profile(p.author).name+' is editing…').join(' · ')}),el('div',{className:'participants'},model.members.map(person)),el('p',{className:'message-meta',textContent:model.members.includes(active)?'All participants can edit. Select a passage to reply in context.':'Read-only: this identity is not a participant.'}),button('Copy share link',async()=>{const url=location.origin+'/#'+encodeURIComponent(selected);await navigator.clipboard.writeText(url);say('Share link copied. This relay is local to this computer.');}),button('Collapse Wave',collapseWave),el('p',{className:'message-meta',textContent:'Collapse moves this Wave into your Archive. Its messages and history are retained.'})])];
   for(const t of [...model.threads.values()].filter(t=>t.parent===null).sort((a,b)=>a.id<b.id?-1:1))for(const b of orderedBlips(model,t.id))content.push(renderBlip(b));
   if(model.members.includes(active)){let composeBox=$('root-compose');if(!composeBox){const slot=el('div');composeBox=el('section',{className:'message',id:'root-compose'},[button('Add message',()=>{const t=[...model.threads.values()].find(t=>t.parent===null);compose(slot,t?.id||null,t?orderedBlips(model,t.id).at(-1)?.id||null:null);}),slot]);}content.push(composeBox);}
   if(model.pending.length||model.rejected.size)content.push(el('p',{className:'message-meta',textContent:`${model.pending.length} pending dependency record(s) · ${model.rejected.size} rejected record(s)`}));
